@@ -1,10 +1,22 @@
 #include "pilha.h"
 #include "fila.h"
+#include "menu.h"
 // #include <stdio.h> | Já tem nas outras bibliotecas, entao nao precisa incluir aqui, pois ja tem nas outras, e se tiver mais de uma vez nao tem problema, o compilador ignora as repeticoes por causa do #ifndef e #define que tem nas bibliotecas
 
 
 
 int main() { // testando as funções de pilha e fila
+    int *opcao_menu;
+    int *personagem;
+    int *pause;
+
+    menu_princiapal(opcao_menu);
+    
+    menu_personagem(personagem);
+    
+    menu_pause(pause);
+
+    /*-----------------------------------------------------------------------       
     tp_pilha p1, p2;
     tp_fila f1;
     
@@ -35,6 +47,7 @@ int main() { // testando as funções de pilha e fila
         printf("%d ", e);
     }
     printf("\n");
-    
+    -----------------------------------------------------------------------*/ 
+
     return 0;
 }

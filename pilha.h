@@ -8,13 +8,14 @@
 typedef int
     tp_item; //define tp_item como se fosse uma declaracao que eh um "int"
 
-    typedef struct {
-        int topo; //so tipo int msm
-        tp_item item[MAX]; //tipo de variavel tp_pilha, igual como se fosse int. e max trocado por 100 no define
-    } tp_pilha; //tp_pilha vira um tipo de variavel como int e float, so que eh do tipo dessa struct criada
+
+typedef struct {
+    int topo; //so tipo int msm
+    tp_item item[MAX]; //tipo de variavel tp_pilha, igual como se fosse int. e max trocado por 100 no define
+} tp_pilha; //tp_pilha vira um tipo de variavel como int e float, so que eh do tipo dessa struct criada
 
 
-    //tipo de variavel tp_pilha e a variavel p com o * sendo o ponteiro que vai receber o local
+//tipo de variavel tp_pilha e a variavel p com o * sendo o ponteiro que vai receber o local
 void inicializa_pilha (tp_pilha *p){
     p -> topo = -1; //para usar ponteiro em variavel que ta numa struct usase "." tipo (quadra.bola), mas se for o primeiro no struct usa "->"
     //se recebesse a struct diretamente e nao o esdereco nao usava "->", seria usaro "p.topo"
@@ -27,6 +28,7 @@ int pilha_vazia (tp_pilha *p){
 return 0;
 }
 
+
 int pilha_cheia (tp_pilha *p){
     if (p -> topo == MAX-1){
         return 1;
@@ -34,6 +36,7 @@ int pilha_cheia (tp_pilha *p){
         return 0;
     }
 }
+
 
 //adicionar a pilha
 int push (tp_pilha *p, tp_item e){ 
@@ -52,6 +55,7 @@ int pop (tp_pilha *p, tp_item *e){
     return 1;
     }
 
+    
 //verificar topo
 int top (tp_pilha *p, tp_item *e){
     if (pilha_vazia(p)) return 0;

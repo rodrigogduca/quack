@@ -5,7 +5,8 @@
 #define MAX 100
 
 
-typedef char tp_item;
+typedef int 
+    tp_item; //define tp_item como se fosse uma declaracao que eh um "int"
 
 
 typedef struct {
