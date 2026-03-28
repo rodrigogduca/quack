@@ -1,54 +1,37 @@
+// Bibliotecas do projeto
 #include "pilha.h"
 #include "fila.h"
-#include "menu.h"
 #include "dados.h"
-// #include <stdio.h> | Já tem nas outras bibliotecas, entao nao precisa incluir aqui, pois ja tem nas outras, e se tiver mais de uma vez nao tem problema, o compilador ignora as repeticoes por causa do #ifndef e #define que tem nas bibliotecas
+#include "menu.h"
+#include "funcoes.h"
 
 
 
-int main() { // testando as funções de pilha e fila
-    int *opcao_menu;
-    int *personagem;
-    int *pause;
 
-    menu_princiapal(opcao_menu);
-    
-    menu_personagem(personagem);
-    
-    menu_pause(pause);
+int main() {
+    int opcao_menu;
+    bool encerrar = false;
 
-    /*-----------------------------------------------------------------------       
-    tp_pilha p1, p2;
-    tp_fila f1;
-    
-    inicializa_pilha(&p1);
-    inicializa_pilha(&p2);
-    inicializa_fila(&f1);
-    
-    push(&p1, 10);
-    push(&p1, 20);
-    push(&p1, 30);
-    
-    push(&p2, 10);
-    push(&p2, 20);
-    push(&p2, 30);
-    
-    if (pilhas_iguais(p1, p2)) {
-        printf("As pilhas são iguais.\n");
-    } else {
-        printf("As pilhas são diferentes.\n");
+    srand((unsigned int)time(NULL));
+
+    while (!encerrar) {
+        limpar_terminal();
+        opcao_menu = menu_principal();
+
+        if (opcao_menu == 1) {
+            int retorno_partida = executar_partida();
+            if (retorno_partida == 1) {
+                encerrar = true;
+            }
+        } else if (opcao_menu == 2) {
+            menu_instrucoes();
+        } else {
+            encerrar = true;
+        }
     }
-    
-    retira_impares(&p1);
-    
-    printf("Pilha p1 após retirar ímpares:\n");
-    while (!pilha_vazia(&p1)) {
-        tp_item e;
-        pop(&p1, &e);
-        printf("%d ", e);
-    }
-    printf("\n");
-    -----------------------------------------------------------------------*/ 
 
+    limpar_terminal();
+    printf("\n\n\n\n\n\n\n======================================\n    Obrigado por jogar QUACK QUIZ!\n======================================\n\n\n\n\n\n\n");
     return 0;
 }
+

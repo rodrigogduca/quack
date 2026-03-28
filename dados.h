@@ -1,12 +1,19 @@
 #ifndef DADOS_H
 #define DADOS_H
+/*  
 
-#include <stdio.h>
+
+ALGUÉM CORRIGE OS CARACTERES TIPO ACENTUADOS E "Ç" QUE FICARAM ERRADOS AQUI, POR FAVOR?
+
+
+
+
+*/
 
 //Infromações cartas
 typedef struct {
     char pergunta[500];
-    char alternativas [500];
+    char alternativas[500];
     int resposta;
     int avanco;
     int dificuldade;
@@ -16,7 +23,7 @@ typedef struct {
 //Informações Player
 typedef struct {
     int posicao;
-    char nome[50];
+    char personagem[50];
     int id_player;
 } tp_player;
 
@@ -25,10 +32,10 @@ typedef struct {
 
 //Definição dos players (Posição inicial, Nome e ID)
 static tp_player player[4] = {
-    {1, "Player 1", 1},
-    {1, "Player 2", 2},
-    {1, "Player 3", 3},
-    {1, "Player 4", 4}
+    {1, "Pato Donald", 1},
+    {1, "Tio patinhas", 2},
+    {1, "Patolino", 3},
+    {1, "Pato", 4}
 };
 
 
@@ -253,8 +260,18 @@ static tp_carta unidade1[12] = {
 };
 
 static tp_carta unidade2[12];
-static tp_carta unidade3[12];
+    /*-------------------------------------------------------------------------------------------------------------------------------  
 
+    Criar as perguntas, alternativas, respostas, avanços, dificuldades e IDs para a unidade 2 seguindo o mesmo formato da unidade 1.
+    
+    -------------------------------------------------------------------------------------------------------------------------------*/  
+   
+static tp_carta unidade3[12];
+   /*-------------------------------------------------------------------------------------------------------------------------------  
+
+   Criar as perguntas, alternativas, respostas, avanços, dificuldades e IDs para a unidade 3 seguindo o mesmo formato da unidade 1.
+
+   -------------------------------------------------------------------------------------------------------------------------------*/
 
 
 #endif
