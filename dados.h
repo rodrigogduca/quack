@@ -1,5 +1,5 @@
-#ifndef CARTAS_H
-#define CARTAS_H
+#ifndef DADOS_H
+#define DADOS_H
 
 #include <stdio.h>
 
