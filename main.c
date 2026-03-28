@@ -1,6 +1,7 @@
 #include "pilha.h"
 #include "fila.h"
 #include "menu.h"
+#include "dados.h"
 // #include <stdio.h> | Já tem nas outras bibliotecas, entao nao precisa incluir aqui, pois ja tem nas outras, e se tiver mais de uma vez nao tem problema, o compilador ignora as repeticoes por causa do #ifndef e #define que tem nas bibliotecas
 
 
