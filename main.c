@@ -11,14 +11,12 @@
 /*
  * Bibliotecas do projeto
  * -----------------------------------------------------------------------------
- * pilha.h  : operacoes da estrutura Pilha (historico de jogadas/posicoes).
- * fila.h   : operacoes da estrutura Fila (ordem de turnos dos jogadores).
+ * estruturas.h: operacoes das estruturas Pilha/Fila.
  * dados.h  : structs e dados fixos do jogo (players e cartas).
  * menu.h   : funcoes de interface textual (menus e leitura validada).
  * funcoes.h: logica da partida (tabuleiro, turnos, dado e cartas).
  */
-#include "pilha.h"
-#include "fila.h"
+#include "estruturas.h"
 #include "dados.h"
 #include "menu.h"
 #include "funcoes.h"
@@ -30,8 +28,17 @@
  */
 #include <stdio.h>
 
+/*
+ * main
+ * -----------------------------------------------------------------------------
+ * Orquestra o ciclo principal da aplicacao:
+ * - inicializa a semente do gerador pseudoaleatorio interno;
+ * - exibe o menu principal continuamente;
+ * - direciona para instrucoes, partida ou encerramento total.
+ */
 int main(void) {
     int opcao_menu;
+    /* 0 = continuar no loop principal | 1 = sair do programa. */
     int encerrar = 0;
 
     /* Define semente fixa do gerador interno sem uso de outras bibliotecas. */

@@ -51,6 +51,11 @@ typedef struct {
 } tp_player;
 
 /*
+ * Os vetores abaixo sao static para manter os dados no proprio modulo,
+ * com acesso direto por inclusao dos cabecalhos no projeto atual.
+ */
+
+/*
  * player
  * -----------------------------------------------------------------------------
  * Base de personagens disponiveis para selecao no inicio da partida.
@@ -295,16 +300,10 @@ static tp_carta unidade1[12] = {
  * Estruturas reservadas para expansao futura do banco de cartas.
  */
 static tp_carta unidade2[12];
-/*
- * Criar as perguntas, alternativas, respostas, avancos, dificuldades e IDs
- * para a unidade 2 seguindo o mesmo formato da unidade 1.
- */
+/* TODO: popular unidade2 no mesmo formato de unidade1. */
    
 static tp_carta unidade3[12];
-/*
- * Criar as perguntas, alternativas, respostas, avancos, dificuldades e IDs
- * para a unidade 3 seguindo o mesmo formato da unidade 1.
- */
+/* TODO: popular unidade3 no mesmo formato de unidade1. */
 
 
 #endif

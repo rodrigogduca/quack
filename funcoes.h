@@ -23,16 +23,19 @@
  * Bibliotecas do projeto
  * -----------------------------------------------------------------------------
  * dados.h: estruturas tp_player/tp_carta e base de cartas/personagens.
- * fila.h : estrutura da fila circular para ordem de turnos.
+ * estruturas.h: pilha e fila para historico e ordem de turnos.
  * menu.h : funcoes de interface (menus, pausa, leitura validada).
- * pilha.h: historico de posicoes de cada jogador.
  */
 #include "dados.h"
-#include "fila.h"
+#include "estruturas.h"
 #include "menu.h"
-#include "pilha.h"
 
-/* Constantes de configuracao da partida. */
+/*
+ * Todas as funcoes deste arquivo sao static porque o jogo compila apenas
+ * a unidade main.c, que inclui este cabecalho com implementacao.
+ */
+
+/* Constantes de configuracao da partida e do tabuleiro. */
 #define MAX_JOGADORES 4
 #define TABULEIRO_LINHAS 5
 #define TABULEIRO_COLUNAS 5
@@ -150,9 +153,12 @@ static void mostrar_carta(const tp_carta *carta) {
 }
 
 /*
- * Retornos:
- * 0 -> voltar para menu principal
- * 1 -> encerrar programa
+ * executar_partida
+ * -----------------------------------------------------------------------------
+ * Executa uma partida completa, do setup de jogadores ate a vitoria.
+ * Retorno:
+ * 0 -> encerrar partida e voltar ao menu principal.
+ * 1 -> encerrar totalmente o programa.
  */
 static int executar_partida(void) {
     /*

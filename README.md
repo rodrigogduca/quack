@@ -1,81 +1,79 @@
 # QUACK QUIZ
 
 Projeto academico da disciplina de Algoritmos e Estruturas de Dados.
-O jogo foi desenvolvido em C e usa Fila e Pilha para controlar o fluxo de turnos e historico de posicoes.
+O jogo foi desenvolvido em C e usa Pilha e Fila para controlar historico e ordem de turnos.
 
 ## Visao Geral
 
-O jogador escolhe personagem, entra em uma partida com 2 a 4 participantes e avanca em um tabuleiro 5x5.
-Em cada turno:
-1. O jogador pode abrir o pause ou rolar o dado.
-2. Ao rolar, avanca de 1 a 6 casas.
-3. Se cair em casa multipla de 3, responde uma carta.
-4. Se acertar a carta, recebe bonus de avanco.
-5. Vence quem chegar primeiro na casa 25.
+No QUACK QUIZ, cada jogador escolhe um personagem e disputa uma corrida em tabuleiro 5x5.
+No turno, o jogador pode abrir o pause ou rolar o dado.
+Quando cai em casa multipla de 3, responde uma carta de pergunta.
+Se acertar, recebe bonus de avancar casas.
+Vence quem chegar primeiro na casa final (25).
 
-## Estrutura do Projeto
+## Estrutura Atual do Projeto
 
-- `main.c`: ponto de entrada do programa e loop do menu principal.
-- `menu.h`: interface textual (menus, pause, leitura validada de inteiros).
-- `funcoes.h`: logica da partida (turnos, dado, cartas, vitoria).
-- `dados.h`: structs e dados estaticos (jogadores e cartas).
-- `fila.h`: implementacao da fila circular (ordem de jogadas).
-- `pilha.h`: implementacao da pilha (historico de posicoes).
+- `main.c`: ponto de entrada, loop do menu principal e encerramento da aplicacao.
+- `menu.h`: interface textual (menus, pausa e leitura validada de inteiros).
+- `funcoes.h`: logica principal da partida (tabuleiro, turnos, dado, cartas e vitoria).
+- `dados.h`: estruturas e dados fixos (personagens e cartas).
+- `estruturas.h`: implementacoes de Pilha e Fila em um unico arquivo.
 
-## Bibliotecas Nativas Utilizadas
+## Bibliotecas Utilizadas
 
-- `<stdio.h>`
-	- Entrada e saida no terminal (`printf`, `fgets`, `sscanf`, `fflush`).
-- `<stdlib.h>`
-	- Funcoes utilitarias e aleatoriedade (`rand`, `srand`).
-- `<stdbool.h>`
-	- Tipo booleano (`bool`, `true`, `false`).
-- `<time.h>`
-	- Semente de aleatoriedade com horario atual (`time(NULL)`).
+- `<stdio.h>`: entrada e saida no terminal (`printf`, `fgets`, `sscanf`, `fflush`).
 
-## Bibliotecas do Projeto e Responsabilidades
+Observacao:
+O projeto foi ajustado para nao depender de `<stdlib.h>`, `<stdbool.h>` e `<time.h>`.
+O dado usa um gerador pseudoaleatorio interno (xorshift32), definido em `funcoes.h`.
+
+## Papel de Cada Arquivo
+
+- `main.c`
+  - Inicializa a semente do gerador interno.
+  - Exibe o menu principal em loop.
+  - Encaminha para instrucoes, partida ou encerramento.
 
 - `menu.h`
-	- Limpa terminal, mostra menus e valida entrada do usuario com intervalo minimo/maximo.
-	- Centraliza menus: principal, instrucoes, pausa, quantidade de jogadores e personagens.
+  - Mostra menus do jogo (principal, instrucoes, pausa, jogadores e personagem).
+  - Valida entradas numericas em intervalo seguro.
+  - Centraliza funcoes de UX textual (limpar tela e aguardar ENTER).
 
 - `funcoes.h`
-	- Inicializa a partida, prepara jogadores e controla o loop de turnos.
-	- Rola dado de 1 a 6 e aplica regra de carta em casas multiplas de 3.
-	- Verifica condicao de vitoria apos movimento e apos bonus de carta.
+  - Configura jogadores, pilha de historico e fila de turnos.
+  - Controla cada turno: dado, movimento, carta e bonus.
+  - Verifica condicoes de vitoria e retornos para menu/encerramento.
 
 - `dados.h`
-	- Define `tp_carta` e `tp_player`.
-	- Mantem vetor base de personagens (`player`) e cartas da unidade 1 (`unidade1`).
+  - Define os tipos `tp_player` e `tp_carta`.
+  - Armazena personagens e baralho da unidade 1.
+  - Reserva as unidades 2 e 3 para expansao futura.
 
-- `fila.h`
-	- Implementa fila circular estatica (`inicializa_fila`, `insere_fila`, `remove_fila`).
-	- Usada para garantir ordem justa de turnos.
+- `estruturas.h`
+  - Implementa Pilha estatica (`push`, `pop`, `top`, etc.).
+  - Implementa Fila circular estatica (`insere_fila`, `remove_fila`, etc.).
+  - Compartilha o mesmo tipo base (`tp_item`) e mesma capacidade (`MAX`).
 
-- `pilha.h`
-	- Implementa pilha estatica (`push`, `pop`, `top`).
-	- Usada para manter historico de posicoes dos jogadores.
+## Fluxo de Execucao
 
-## Fluxo Geral da Partida
-
-1. `main` exibe menu principal.
-2. Ao iniciar jogo, `executar_partida` configura jogadores e fila de turnos.
-3. Para cada turno:
-	 - remove jogador da fila;
-	 - mostra opcao de rolar dado ou abrir pause;
-	 - move jogador com dado aleatorio;
-	 - se casa final for multipla de 3, aplica carta;
-	 - reinsere jogador no fim da fila.
-4. Ao atingir casa 25, encerra partida e retorna ao menu principal.
+1. `main` mostra o menu principal.
+2. Ao iniciar jogo, `executar_partida` prepara jogadores e fila de turnos.
+3. Em cada turno:
+   - remove o jogador da fila;
+   - permite rolar dado ou abrir pause;
+   - move o jogador no tabuleiro;
+   - aplica carta se cair em multiplo de 3;
+   - reinsere o jogador no fim da fila.
+4. Ao chegar na casa 25, o jogo declara vencedor e retorna ao menu principal.
 
 ## Regras Implementadas
 
-- Quantidade de jogadores: 2 a 4.
-- Dado: valor aleatorio entre 1 e 6.
+- Jogadores: minimo 2 e maximo 4.
+- Dado: valores de 1 a 6.
 - Carta: aparece apenas em casas multiplas de 3.
-- Bonus: acerto de carta avanca casas extras.
-- Pause durante turno e durante resposta da carta.
-- Vitoria ao chegar na casa final (25).
+- Bonus: aplicado somente em acerto da carta.
+- Pause: disponivel antes de rolar dado e durante resposta da carta.
+- Vitoria: ao atingir a casa final (25).
 
 ## Compilacao e Execucao
 
@@ -93,15 +91,8 @@ gcc -Wall -Wextra -pedantic -std=c11 -o quack main.c
 ./quack
 ```
 
-## Observacoes Importantes
+## Observacoes
 
 - Nao compile arquivos `.h` diretamente.
-	- Exemplo incorreto: `gcc funcoes.h -o funcoes`
-	- Exemplo correto: `gcc -o quack main.c`
-- As unidades 2 e 3 de cartas estao reservadas para expansao futura.
-
-## Padrao de Codigo Aplicado
-
-- Comentarios explicativos em todos os arquivos principais.
-- Organizacao por secoes (cabecalho, includes, constantes, funcoes).
-- Nomes e mensagens padronizados em portugues sem acentos para evitar problema de codificacao no terminal.
+- Comando correto para gerar executavel: `gcc -o quack main.c`.
+- O codigo usa comentarios explicativos por modulo e por funcao para facilitar manutencao.

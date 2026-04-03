@@ -25,7 +25,13 @@
  */
 #include "dados.h"
 
+/* Limite de personagens/jogadores exibidos no menu de selecao. */
 #define MENU_MAX_JOGADORES 4
+
+/*
+ * As funcoes deste cabecalho sao static e foram projetadas para serem
+ * usadas dentro da unidade de compilacao principal do jogo.
+ */
 
 /*
  * limpar_terminal
