@@ -1,57 +1,107 @@
-# QUACK
+# QUACK QUIZ
 
-Trabalho da disciplina Algoritmos e Estrutura de Dados. Tendo como escopo um jogo de tabuleiro, desenvolvido na linguagem de programação C. Utilizando estruturas de Filas e Pilhas.
+Projeto academico da disciplina de Algoritmos e Estruturas de Dados.
+O jogo foi desenvolvido em C e usa Fila e Pilha para controlar o fluxo de turnos e historico de posicoes.
 
+## Visao Geral
 
-## Regras do Jogo
-O jogo é composto por um tabuleiro de 5x5, onde cada jogador tem uma peça que pode se mover em quatro direções: cima, baixo, esquerda e direita. O objetivo do jogo é chegar ao lado oposto do tabuleiro antes do adversário. Os jogadores podem se mover apenas para casas vazias e não podem passar por cima do adversário. O primeiro jogador a alcançar o lado oposto do tabuleiro vence o jogo.
+O jogador escolhe personagem, entra em uma partida com 2 a 4 participantes e avanca em um tabuleiro 5x5.
+Em cada turno:
+1. O jogador pode abrir o pause ou rolar o dado.
+2. Ao rolar, avanca de 1 a 6 casas.
+3. Se cair em casa multipla de 3, responde uma carta.
+4. Se acertar a carta, recebe bonus de avanco.
+5. Vence quem chegar primeiro na casa 25.
 
-## Estruturas de Dados Utilizadas
+## Estrutura do Projeto
 
-- **Fila**: Utilizada para gerenciar a ordem dos jogadores e suas jogadas. Cada jogador é enfileirado e, após realizar sua jogada, é colocado no final da fila.
+- `main.c`: ponto de entrada do programa e loop do menu principal.
+- `menu.h`: interface textual (menus, pause, leitura validada de inteiros).
+- `funcoes.h`: logica da partida (turnos, dado, cartas, vitoria).
+- `dados.h`: structs e dados estaticos (jogadores e cartas).
+- `fila.h`: implementacao da fila circular (ordem de jogadas).
+- `pilha.h`: implementacao da pilha (historico de posicoes).
 
-- **Pilha**: Utilizada para armazenar as jogadas realizadas por cada jogador, permitindo que eles possam desfazer suas jogadas se necessário. Cada jogador tem sua própria pilha de jogadas, onde cada jogada é empilhada após ser realizada.
+## Bibliotecas Nativas Utilizadas
 
-- **Tabuleiro**: Representado por uma matriz 5x5, onde cada posição pode estar vazia ou ocupada por um jogador. O tabuleiro é atualizado a cada jogada, refletindo as posições atuais dos jogadores.
+- `<stdio.h>`
+	- Entrada e saida no terminal (`printf`, `fgets`, `sscanf`, `fflush`).
+- `<stdlib.h>`
+	- Funcoes utilitarias e aleatoriedade (`rand`, `srand`).
+- `<stdbool.h>`
+	- Tipo booleano (`bool`, `true`, `false`).
+- `<time.h>`
+	- Semente de aleatoriedade com horario atual (`time(NULL)`).
 
-- **Jogadores**: Cada jogador é representado por uma estrutura que contém informações como nome, posição atual no tabuleiro e a pilha de jogadas realizadas.
+## Bibliotecas do Projeto e Responsabilidades
 
-- **Jogada**: Representada por uma estrutura que contém informações sobre a direção do movimento e a posição anterior do jogador, permitindo que as jogadas possam ser desfeitas.
+- `menu.h`
+	- Limpa terminal, mostra menus e valida entrada do usuario com intervalo minimo/maximo.
+	- Centraliza menus: principal, instrucoes, pausa, quantidade de jogadores e personagens.
 
-- **Jogo**: Representado por uma estrutura que contém o tabuleiro, a fila de jogadores e as regras do jogo. Esta estrutura é responsável por gerenciar o fluxo do jogo, verificando as condições de vitória e garantindo que as jogadas sejam válidas.
+- `funcoes.h`
+	- Inicializa a partida, prepara jogadores e controla o loop de turnos.
+	- Rola dado de 1 a 6 e aplica regra de carta em casas multiplas de 3.
+	- Verifica condicao de vitoria apos movimento e apos bonus de carta.
 
-- **Funções**: O jogo inclui funções para inicializar o tabuleiro, adicionar jogadores à fila, realizar jogadas, desfazer jogadas, verificar condições de vitória e exibir o estado atual do jogo. Essas funções são essenciais para garantir a funcionalidade do jogo e a interação entre os jogadores.
+- `dados.h`
+	- Define `tp_carta` e `tp_player`.
+	- Mantem vetor base de personagens (`player`) e cartas da unidade 1 (`unidade1`).
 
-- **Interface de Usuário**: O jogo possui uma interface de usuário simples, onde os jogadores podem inserir seus nomes, escolher suas jogadas e visualizar o estado atual do tabuleiro. A interface é projetada para ser intuitiva e fácil de usar, permitindo que os jogadores se concentrem na estratégia do jogo.
+- `fila.h`
+	- Implementa fila circular estatica (`inicializa_fila`, `insere_fila`, `remove_fila`).
+	- Usada para garantir ordem justa de turnos.
 
-- **Validação de Jogadas**: O jogo inclui uma função de validação de jogadas, que verifica se a jogada é válida antes de ser executada. Isso inclui verificar se a posição de destino está dentro dos limites do tabuleiro, se a casa está vazia e se o movimento é permitido de acordo com as regras do jogo.
+- `pilha.h`
+	- Implementa pilha estatica (`push`, `pop`, `top`).
+	- Usada para manter historico de posicoes dos jogadores.
 
-- **Condições de Vitória**: O jogo verifica as condições de vitória após cada jogada, verificando se um jogador alcançou o lado oposto do tabuleiro. Se um jogador vencer, o jogo é encerrado e o vencedor é anunciado.
+## Fluxo Geral da Partida
 
-- **Desfazer Jogadas**: Os jogadores têm a opção de desfazer suas jogadas, utilizando a pilha de jogadas para retornar à posição anterior. Isso permite que os jogadores corrijam erros ou mudem sua estratégia durante o jogo.
+1. `main` exibe menu principal.
+2. Ao iniciar jogo, `executar_partida` configura jogadores e fila de turnos.
+3. Para cada turno:
+	 - remove jogador da fila;
+	 - mostra opcao de rolar dado ou abrir pause;
+	 - move jogador com dado aleatorio;
+	 - se casa final for multipla de 3, aplica carta;
+	 - reinsere jogador no fim da fila.
+4. Ao atingir casa 25, encerra partida e retorna ao menu principal.
 
-- **Gerenciamento de Jogadores**: O jogo permite que os jogadores sejam adicionados à fila, e a ordem de jogada é gerenciada de forma justa. Após cada jogada, o jogador é colocado no final da fila, garantindo que todos os jogadores tenham a mesma oportunidade de jogar.
+## Regras Implementadas
 
-- **Atualização do Tabuleiro**: O tabuleiro é atualizado a cada jogada, refletindo as posições atuais dos jogadores. Isso permite que os jogadores visualizem o estado do jogo e planejem suas próximas jogadas de acordo com a posição dos adversários.
+- Quantidade de jogadores: 2 a 4.
+- Dado: valor aleatorio entre 1 e 6.
+- Carta: aparece apenas em casas multiplas de 3.
+- Bonus: acerto de carta avanca casas extras.
+- Pause durante turno e durante resposta da carta.
+- Vitoria ao chegar na casa final (25).
 
-- **Estratégia de Jogo**: O jogo incentiva os jogadores a desenvolverem estratégias para alcançar o lado oposto do tabuleiro, considerando as posições dos adversários e as possíveis jogadas. Os jogadores podem tentar bloquear os movimentos dos adversários ou criar caminhos para si mesmos, tornando o jogo mais desafiador e divertido.
+## Compilacao e Execucao
 
-- **Multijogador**: O jogo é projetado para ser jogado por dois ou mais jogadores, permitindo que amigos e familiares se divirtam juntos. A interação entre os jogadores é uma parte fundamental do jogo, promovendo a competição saudável e a diversão.
+### Windows (PowerShell)
 
-- **Extensibilidade**: O jogo é projetado de forma modular, permitindo que novas funcionalidades sejam adicionadas facilmente no futuro. Isso inclui a possibilidade de adicionar novos tipos de jogadas, diferentes tamanhos de tabuleiro ou até mesmo modos de jogo adicionais, tornando o jogo mais versátil e atraente para uma variedade de jogadores.
-
-
-## Conclusão
-O jogo QUACK é uma implementação divertida e estratégica de um jogo de tabuleiro, utilizando estruturas de dados como filas e pilhas para gerenciar os jogadores e suas jogadas. Com regras simples e uma interface intuitiva, o jogo é acessível para jogadores de todas as idades, promovendo a diversão e a competição saudável entre amigos e familiares. A modularidade do código permite que o jogo seja facilmente expandido no futuro, garantindo que ele continue a ser uma fonte de entretenimento por muito tempo.
-
-
-## Compilação e Execução
-Para compilar o jogo, utilize o seguinte comando no terminal:
-```bash
-gcc -o quack quack.c
+```powershell
+gcc -Wall -Wextra -pedantic -std=c11 -o quack main.c
+.\quack
 ```
-Após a compilação, execute o jogo com o comando:
+
+### Linux/macOS
+
 ```bash
+gcc -Wall -Wextra -pedantic -std=c11 -o quack main.c
 ./quack
 ```
-Certifique-se de ter o ambiente de desenvolvimento C configurado corretamente para compilar e executar o jogo sem problemas. Divirta-se jogando QUACK!
+
+## Observacoes Importantes
+
+- Nao compile arquivos `.h` diretamente.
+	- Exemplo incorreto: `gcc funcoes.h -o funcoes`
+	- Exemplo correto: `gcc -o quack main.c`
+- As unidades 2 e 3 de cartas estao reservadas para expansao futura.
+
+## Padrao de Codigo Aplicado
+
+- Comentarios explicativos em todos os arquivos principais.
+- Organizacao por secoes (cabecalho, includes, constantes, funcoes).
+- Nomes e mensagens padronizados em portugues sem acentos para evitar problema de codificacao no terminal.
