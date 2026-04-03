@@ -2,6 +2,8 @@
 #define DADOS_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
 
 //Infromações cartas
 typedef struct {
@@ -255,6 +257,47 @@ static tp_carta unidade1[12] = {
 static tp_carta unidade2[12];
 static tp_carta unidade3[12];
 
+void pergunta(){
+    int dificuldade = (rand() % 3) + 1; //Sorteia um numero de 1 a 3 para ser a dificuldade 
+    int pergunta_sorteada;
+    
+    if(dificuldade == 1){
+        pergunta_sorteada = rand() % 4; //pega um numero de 0 a 3 para ser a carta escolhida de difildade 1
+    }
+    if(dificuldade == 2){
+        pergunta_sorteada = (rand() % 4) + 4; //pega um numero de 4 a 7 para der a carta escolhida de dificuldade 2
+    }
+    if(dificuldade == 3 ){
+        pergunta_sorteada = (rand() % 4) + 8; //pega um numero de 8 a 11 para ser a carta escolhida de difilculdade 3
+    }
+    
+    tp_carta carta_escolhida = unidade1[pergunta_sorteada]; //escolhe a carta selecionada no static unidade1 de acordo com o indice da carta
+    
+    // mostra a pergunta, as alternativas e a dificuldade da carta para o jogador
+    printf("CARTA SORTEADA! (Dificuldade %d)\n", carta_escolhida.dificuldade);
+    printf("%s\n", carta_escolhida.pergunta);
+    printf("%s\n", carta_escolhida.alternativas);
+    
+    //recebe a resposta do jogador
+    int resposta_jogador; // pra diferenciar da resposta da pergunta
+    printf("Digite o número da sua resposta aqui abaixo:");
+    scanf("%d", &resposta_jogador);
+    
+    //verifica se a resposta eesta correta
+    if(resposta_jogador == carta_escolhida.resposta){
+        printf("RESPOSTA...");
+        Sleep(2000);// cria um suspense para a resposta. Se der a gente coloca um audio de "soando os tambores" pra fazer graça kkkk
+        printf("CORRETA!!!!");
+        printf("Você avança %d casas!", carta_escolhida.avanco);//como ainda falta montar o tabuleiro não adicionei nada que faca o jogador avancar de fato
+    }
+    else{
+        printf("RESPOSTA...");
+        Sleep(2000);
+        printf("Errada :(");// Aqui a gente bota um som de quen quen quen kkkk
+        printf("A resposta correta era: %d", carta_escolhida.resposta);
+    }
+    
+}
 
 
-#endif
+#endif  
