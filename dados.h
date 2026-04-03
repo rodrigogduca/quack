@@ -285,16 +285,16 @@ void pergunta(){
     
     //verifica se a resposta eesta correta
     if(resposta_jogador == carta_escolhida.resposta){
-        printf("RESPOSTA...");
+        printf("RESPOSTA...\n");
         Sleep(2000);// cria um suspense para a resposta. Se der a gente coloca um audio de "soando os tambores" pra fazer graça kkkk
-        printf("CORRETA!!!!");
-        printf("Você avança %d casas!", carta_escolhida.avanco);//como ainda falta montar o tabuleiro não adicionei nada que faca o jogador avancar de fato
+        printf("CORRETA!!!!\n");
+        printf("Você avança %d casas!\n", carta_escolhida.avanco);//como ainda falta montar o tabuleiro não adicionei nada que faca o jogador avancar de fato
     }
     else{
-        printf("RESPOSTA...");
+        printf("RESPOSTA...\n");
         Sleep(2000);
-        printf("Errada :(");// Aqui a gente bota um som de quen quen quen kkkk
-        printf("A resposta correta era: %d", carta_escolhida.resposta);
+        printf("Errada :(\n");// Aqui a gente bota um som de quen quen quen kkkk
+        printf("A resposta correta era: %d\n", carta_escolhida.resposta);
     }
     
 }
