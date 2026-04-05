@@ -3,56 +3,139 @@
 #include "menu.h"
 #include "dados.h"
 #include <locale.h>
-#include <time.h> //necessária para que relamente exista a aleatoriedade no codigo
-// #include <stdio.h> | Já tem nas outras bibliotecas, entao nao precisa incluir aqui, pois ja tem nas outras, e se tiver mais de uma vez nao tem problema, o compilador ignora as repeticoes por causa do #ifndef e #define que tem nas bibliotecas
+#include <time.h>
 
-
-
-int main() { // testando as funções de pilha e fila
-    srand(time(NULL));//faz com que a aleatoriedade funcione corretamente
+int main() {
+    srand(time(NULL));
     setlocale(LC_ALL, "Portuguese");
-    int *opcao_menu;
-    int *personagem;
-    int *pause;
-
-    menu_princiapal(opcao_menu);
     
-    menu_personagem(personagem);
+    int opcao_menu;
+    int num_jogadores;
+    int jogador_atual = 0;
+    int rodada = 1;
+    int jogo_ativo = 1;
     
-    menu_pause(pause);
-
-    /*-----------------------------------------------------------------------       
-    tp_pilha p1, p2;
-    tp_fila f1;
+    // Fila para controlar a ordem dos turnos
+    tp_fila fila_turnos;
     
-    inicializa_pilha(&p1);
-    inicializa_pilha(&p2);
-    inicializa_fila(&f1);
-    
-    push(&p1, 10);
-    push(&p1, 20);
-    push(&p1, 30);
-    
-    push(&p2, 10);
-    push(&p2, 20);
-    push(&p2, 30);
-    
-    if (pilhas_iguais(p1, p2)) {
-        printf("As pilhas são iguais.\n");
-    } else {
-        printf("As pilhas são diferentes.\n");
+    // Loop principal do jogo
+    while (jogo_ativo) {
+        opcao_menu = menu_principal();
+        
+        if (opcao_menu == 2) {
+            printf("\nAte mais! Obrigado por jogar QUACK QUIZ!\n");
+            break;
+        }
+        
+        if (opcao_menu == 1) {
+            // Novo jogo - selecionar numero de jogadores
+            num_jogadores = menu_num_jogadores();
+            
+            printf("\n================================\n");
+            printf("   SELECIONANDO PERSONAGENS     \n");
+            printf("================================\n");
+            
+            // Reinicia posicao dos jogadores usando a estrutura player[] de dados.h
+            for (int i = 0; i < 4; i++) {
+                player[i].posicao = 1;
+            }
+            
+            // Inicializa fila de turnos
+            inicializa_fila(&fila_turnos);
+            
+            // Selecionar personagem para cada jogador
+            for (int i = 0; i < num_jogadores; i++) {
+                int personagem = menu_personagem(i + 1);
+                sprintf(player[i].nome, "Jogador %d (%s)", i + 1, nome_personagem(personagem));
+                printf("\n%s selecionado!\n", player[i].nome);
+                
+                // Adiciona jogador na fila de turnos
+                insere_fila(&fila_turnos, player[i].id_player);
+            }
+            
+            // Reseta perguntas usadas
+            resetar_perguntas();
+            
+            printf("\n================================\n");
+            printf("        JOGO INICIADO!          \n");
+            printf("================================\n");
+            printf("Jogadores participando:\n");
+            for (int i = 0; i < num_jogadores; i++) {
+                printf("  - %s (Casa %d)\n", player[i].nome, player[i].posicao);
+            }
+            
+            // Loop do jogo
+            int em_jogo = 1;
+            rodada = 1;
+            
+            while (em_jogo) {
+                // Pega o proximo jogador da fila (sistema circular)
+                tp_item id_jogador;
+                remove_fila(&fila_turnos, &id_jogador);
+                jogador_atual = id_jogador - 1; // Converte ID para indice (ID comeca em 1)
+                
+                // Reinsere na fila para manter o ciclo
+                insere_fila(&fila_turnos, id_jogador);
+                
+                printf("\n========================================\n");
+                printf("           RODADA %d                     \n", rodada);
+                printf("========================================\n");
+                printf("Vez de: %s\n", player[jogador_atual].nome);
+                printf("Posicao atual: Casa %d\n", player[jogador_atual].posicao);
+                printf("----------------------------------------\n");
+                printf("Pressione ENTER para sortear uma pergunta...");
+                getchar(); // limpa buffer
+                getchar(); // espera enter
+                
+                // Faz a pergunta
+                int resultado = pergunta_com_retorno();
+                
+                if (resultado > 0) {
+                    player[jogador_atual].posicao += resultado;
+                    printf("\n%s avancou para a casa %d!\n", 
+                           player[jogador_atual].nome, 
+                           player[jogador_atual].posicao);
+                    
+                    // Verifica vitoria (casa 20)
+                    if (player[jogador_atual].posicao >= 20) {
+                        printf("\n========================================\n");
+                        printf("        VENCEDOR!!!                      \n");
+                        printf("========================================\n");
+                        printf("%s VENCEU O JOGO!\n", player[jogador_atual].nome);
+                        printf("========================================\n");
+                        em_jogo = 0;
+                        continue;
+                    }
+                }
+                
+                // Mostra placar
+                printf("\n--- PLACAR ---\n");
+                for (int i = 0; i < num_jogadores; i++) {
+                    printf("%s: Casa %d\n", player[i].nome, player[i].posicao);
+                }
+                
+                // Menu de pause
+                printf("\n[1] Continuar  [2] Menu Principal  [3] Sair\n");
+                printf("Opcao: ");
+                int pausa;
+                scanf("%d", &pausa);
+                
+                if (pausa == 2) {
+                    em_jogo = 0;
+                    continue;
+                } else if (pausa == 3) {
+                    em_jogo = 0;
+                    jogo_ativo = 0;
+                    continue;
+                }
+                
+                // Verifica se completou uma rodada
+                if (jogador_atual == num_jogadores - 1) {
+                    rodada++;
+                }
+            }
+        }
     }
     
-    retira_impares(&p1);
-    
-    printf("Pilha p1 após retirar ímpares:\n");
-    while (!pilha_vazia(&p1)) {
-        tp_item e;
-        pop(&p1, &e);
-        printf("%d ", e);
-    }
-    printf("\n");
-    -----------------------------------------------------------------------*/ 
-
     return 0;
 }

@@ -3,56 +3,79 @@
 
 #include <stdio.h>
 
-int menu_princiapal(int *opcao_menu){
-
-    printf("================================\n");
-    printf("            QUACK QUIZ         \n");
+int menu_principal() {
+    int opcao;
     
-    //FAZER O PATO DO CLUBE
-    
+    printf("\n================================\n");
+    printf("         QUACK QUIZ             \n");
     printf("================================\n");
     printf("1. Novo jogo\n");
     printf("2. Sair\n");
     printf("================================\n");
     printf("Digite alguma opcao: ");
-    scanf("%d\n", &opcao_menu);
+    scanf("%d", &opcao);
+    
+    return opcao;
+}
 
+int menu_num_jogadores() {
+    int num;
+    
+    printf("\n================================\n");
+    printf("   QUANTOS JOGADORES? (2-4)     \n");
+    printf("================================\n");
+    printf("Digite o numero de jogadores: ");
+    scanf("%d", &num);
+    
+    if (num < 2) num = 2;
+    if (num > 4) num = 4;
+    
+    return num;
 }
  
-void menu_personagem(int *personagem) {
-
-    printf("================================\n\n");
-    printf("SELECIONE SEU PERSONAGEM!\n\n");
-    printf("================================\n\n");
+int menu_personagem(int jogador_num) {
+    int personagem;
+    
+    printf("\n================================\n");
+    printf("  JOGADOR %d - SELECIONE SEU PERSONAGEM!\n", jogador_num);
+    printf("================================\n");
     printf("1. Patolino\n");
     printf("2. Pato Donald\n");
     printf("3. Tio Patinhas\n");
-    printf("4. Pato\n\n");
-    
+    printf("4. Pato\n");
     printf("--------------------------------\n");
-    printf("0. Voltar\n");
-    printf("--------------------------------\n");
-    printf("Digite alguma opcao: ");
+    printf("Digite sua opcao: ");
     scanf("%d", &personagem);
     
+    if (personagem < 1 || personagem > 4) personagem = 1;
+    
+    return personagem;
 }
 
-void menu_pause(int *pause) {
+const char* nome_personagem(int id) {
+    switch(id) {
+        case 1: return "Patolino";
+        case 2: return "Pato Donald";
+        case 3: return "Tio Patinhas";
+        case 4: return "Pato";
+        default: return "Desconhecido";
+    }
+}
+
+int menu_pause() {
     int opcao;
+    
     printf("\n================================\n");
     printf("              PAUSE              \n");
-    printf("================================\n\n");
-    
-    printf("         1. Continuar\n");
-    printf("  2. Sair para o menu principal\n");
+    printf("================================\n");
+    printf("1. Continuar\n");
+    printf("2. Sair para o menu principal\n");
+    printf("3. Sair do jogo\n");
     printf("--------------------------------\n");
-    printf("        3. Sair do jogo\n");
-    printf("--------------------------------\n");
-    printf("    Digite a opcao desejada:"); 
-    scanf("%d", &pause); 
-    printf("\n\n================================");
-
+    printf("Digite a opcao desejada: "); 
+    scanf("%d", &opcao);
     
+    return opcao;
 }
 
 #endif

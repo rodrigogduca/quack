@@ -257,47 +257,84 @@ static tp_carta unidade1[12] = {
 static tp_carta unidade2[12];
 static tp_carta unidade3[12];
 
-void pergunta(){
-    int dificuldade = (rand() % 3) + 1; //Sorteia um numero de 1 a 3 para ser a dificuldade 
-    int pergunta_sorteada;
-    
-    if(dificuldade == 1){
-        pergunta_sorteada = rand() % 4; //pega um numero de 0 a 3 para ser a carta escolhida de difildade 1
+// Array para controlar quais perguntas já foram usadas
+static int perguntas_usadas[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static int total_perguntas_usadas = 0;
+
+// Reseta as perguntas usadas
+void resetar_perguntas() {
+    for (int i = 0; i < 12; i++) {
+        perguntas_usadas[i] = 0;
     }
-    if(dificuldade == 2){
-        pergunta_sorteada = (rand() % 4) + 4; //pega um numero de 4 a 7 para der a carta escolhida de dificuldade 2
-    }
-    if(dificuldade == 3 ){
-        pergunta_sorteada = (rand() % 4) + 8; //pega um numero de 8 a 11 para ser a carta escolhida de difilculdade 3
-    }
-    
-    tp_carta carta_escolhida = unidade1[pergunta_sorteada]; //escolhe a carta selecionada no static unidade1 de acordo com o indice da carta
-    
-    // mostra a pergunta, as alternativas e a dificuldade da carta para o jogador
-    printf("CARTA SORTEADA! (Dificuldade %d)\n", carta_escolhida.dificuldade);
-    printf("%s\n", carta_escolhida.pergunta);
-    printf("%s\n", carta_escolhida.alternativas);
-    
-    //recebe a resposta do jogador
-    int resposta_jogador; // pra diferenciar da resposta da pergunta
-    printf("Digite o número da sua resposta aqui abaixo:");
-    scanf("%d", &resposta_jogador);
-    
-    //verifica se a resposta eesta correta
-    if(resposta_jogador == carta_escolhida.resposta){
-        printf("RESPOSTA...\n");
-        Sleep(2000);// cria um suspense para a resposta. Se der a gente coloca um audio de "soando os tambores" pra fazer graça kkkk
-        printf("CORRETA!!!!\n");
-        printf("Você avança %d casas!\n", carta_escolhida.avanco);//como ainda falta montar o tabuleiro não adicionei nada que faca o jogador avancar de fato
-    }
-    else{
-        printf("RESPOSTA...\n");
-        Sleep(2000);
-        printf("Errada :(\n");// Aqui a gente bota um som de quen quen quen kkkk
-        printf("A resposta correta era: %d\n", carta_escolhida.resposta);
-    }
-    
+    total_perguntas_usadas = 0;
 }
 
+// Faz uma pergunta e retorna o avanço se acertar, 0 se errar
+int pergunta_com_retorno(){
+    // Se todas as perguntas foram usadas, reseta
+    if (total_perguntas_usadas >= 12) {
+        resetar_perguntas();
+    }
+    
+    int dificuldade = (rand() % 3) + 1;
+    int pergunta_sorteada;
+    int inicio;
+    
+    // Define range baseado na dificuldade (4 perguntas por nivel)
+    if(dificuldade == 1){
+        inicio = 0;
+    } else if(dificuldade == 2){
+        inicio = 4;
+    } else {
+        inicio = 8;
+    }
+    
+    // Tenta encontrar uma pergunta não usada na dificuldade
+    int tentativas = 0;
+    do {
+        pergunta_sorteada = inicio + (rand() % 4);
+        tentativas++;
+        // Se não achar na dificuldade, tenta qualquer uma disponivel
+        if (tentativas > 10) {
+            for (int i = 0; i < 12; i++) {
+                if (!perguntas_usadas[i]) {
+                    pergunta_sorteada = i;
+                    break;
+                }
+            }
+            break;
+        }
+    } while (perguntas_usadas[pergunta_sorteada]);
+    
+    // Marca como usada
+    perguntas_usadas[pergunta_sorteada] = 1;
+    total_perguntas_usadas++;
+    
+    tp_carta carta = unidade1[pergunta_sorteada];
+    
+    printf("\n========================================\n");
+    printf("   CARTA SORTEADA! (Dificuldade %d)     \n", carta.dificuldade);
+    printf("========================================\n");
+    printf("\n%s\n", carta.pergunta);
+    printf("%s\n", carta.alternativas);
+    
+    int resposta_jogador;
+    printf("Digite o numero da sua resposta: ");
+    scanf("%d", &resposta_jogador);
+    
+    printf("\nRESPOSTA...\n");
+    Sleep(1500);
+    
+    if(resposta_jogador == carta.resposta){
+        printf("\n*** CORRETA! ***\n");
+        printf("Voce avanca %d casa(s)!\n", carta.avanco);
+        return carta.avanco;
+    }
+    else{
+        printf("\n*** ERRADA! ***\n");
+        printf("A resposta correta era: %d\n", carta.resposta);
+        return 0;
+    }
+}
 
-#endif  
+#endif
