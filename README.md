@@ -31,9 +31,10 @@ gcc -o quack main.c
 | Arquivo | Descrição |
 |---------|-----------|
 | `main.c` | Loop principal do jogo |
-| `dados.h` | Estruturas de dados (jogadores, cartas) e perguntas |
+| `dados.h` | Cartas, jogadores, pilha de cartas e perguntas |
 | `menu.h` | Funções dos menus (principal, personagem, pause) |
-| `estruturas.h` | Implementação de Pilha e Fila |
+| `pilha.h` | Implementação de Pilha (LIFO) |
+| `fila.h` | Implementação de Fila (FIFO) |
 
 ## 🔧 Estruturas de Dados Utilizadas
 
@@ -41,13 +42,14 @@ gcc -o quack main.c
 - Controla a ordem dos turnos dos jogadores
 - Implementação circular (FIFO)
 
-### Pilha (`tp_pilha`)  
-- Disponível para histórico de jogadas
-- Implementação estática (LIFO)
+### Pilha de Cartas (`tp_pilha_cartas`)
+- Armazena as cartas de perguntas por dificuldade
+- 3 pilhas separadas: fácil, médio, difícil
+- Embaralhamento usando Fisher-Yates
 
 ### Estruturas Personalizadas
 - `tp_player`: Dados do jogador (posição, nome, ID)
-- `tp_carta`: Dados das perguntas (pergunta, alternativas, resposta, avanço, dificuldade)
+- `tp_carta`: Dados das perguntas (pergunta, alternativas em matriz, resposta, avanço, dificuldade)
 
 ## 🎯 Sistema de Perguntas
 
@@ -56,6 +58,7 @@ gcc -o quack main.c
 - **Dificuldade 2**: Avança 2 casas (4 perguntas)
 - **Dificuldade 3**: Avança 3 casas (4 perguntas)
 - Perguntas não se repetem até todas serem usadas
+- Alternativas armazenadas em matriz `char[5][150]`
 
 ## 🦆 Personagens
 

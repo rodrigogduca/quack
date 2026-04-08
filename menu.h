@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include <stdio.h>
+#include <string.h>
 
 int menu_principal() {
     int opcao;
@@ -52,13 +53,14 @@ int menu_personagem(int jogador_num) {
     return personagem;
 }
 
-const char* nome_personagem(int id) {
+// Copia o nome do personagem para o buffer fornecido
+void nome_personagem(int id, char *buffer) {
     switch(id) {
-        case 1: return "Patolino";
-        case 2: return "Pato Donald";
-        case 3: return "Tio Patinhas";
-        case 4: return "Pato";
-        default: return "Desconhecido";
+        case 1: sprintf(buffer, "Patolino"); break;
+        case 2: sprintf(buffer, "Pato Donald"); break;
+        case 3: sprintf(buffer, "Tio Patinhas"); break;
+        case 4: sprintf(buffer, "Pato"); break;
+        default: sprintf(buffer, "Desconhecido"); break;
     }
 }
 
