@@ -9,7 +9,6 @@
 #include "pilha.h"
 
 #define NUM_ALTERNATIVAS 5
-#define MAX_JOGADORES 4
 #define NUM_CARTAS 12
 
 typedef struct {

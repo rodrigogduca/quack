@@ -4,7 +4,7 @@
 #include "dados.h"
 
 int main() {
-    tp_player jogadores[MAX_JOGADORES];
+    tp_player jogadores[4];
     tp_pilha_cartas pilha_facil, pilha_medio, pilha_dificil;
     tp_fila fila_turnos;
     tp_item id_jogador;
@@ -30,7 +30,7 @@ int main() {
             printf("   SELECIONANDO PERSONAGENS     \n");
             printf("================================\n");
             
-            inicializar_jogadores(jogadores, MAX_JOGADORES);
+            inicializar_jogadores(jogadores, 4);
             inicializa_fila(&fila_turnos);
             
             for (i = 0; i < num_jogadores; i++) {

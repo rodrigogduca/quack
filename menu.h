@@ -36,9 +36,9 @@ int menu_num_jogadores() {
     printf("\n================================\n");
     printf("      MODO FIXO DE PARTIDA      \n");
     printf("================================\n");
-    printf("Esta partida sempre usa %d jogadores.\n", MAX_JOGADORES);
+    printf("Esta partida sempre usa %d jogadores.\n", 4);
 
-    return MAX_JOGADORES;
+    return 4;
 }
 
 int menu_personagem(int jogador_num) {
@@ -113,7 +113,7 @@ void configurar_jogadores(tp_player jogadores[], tp_fila *fila_turnos, int num_j
     printf("   SELECIONANDO PERSONAGENS     \n");
     printf("================================\n");
 
-    inicializar_jogadores(jogadores, MAX_JOGADORES);
+    inicializar_jogadores(jogadores, 4);
     inicializa_fila(fila_turnos);
 
     for (i = 0; i < num_jogadores; i++) {
@@ -139,7 +139,7 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_pilha *p
 }
 
 int executar_partida() {
-    tp_player jogadores[MAX_JOGADORES];
+    tp_player jogadores[4];
     tp_fila fila_turnos;
     tp_pilha pilha_cartas;
     tp_item id_jogador;
