@@ -10,9 +10,14 @@
 
 #include <stdio.h>
 
+#ifndef MAX
 #define MAX 100
+#endif
 
+#ifndef TP_ITEM_DEFINED
+#define TP_ITEM_DEFINED
 typedef int tp_item;
+#endif
 
 /*
  * tp_pilha
