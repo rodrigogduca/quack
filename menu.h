@@ -2,18 +2,19 @@
 #define MENU_H
 
 #include <stdio.h>
-#include <string.h>
 
 #include "fila.h"
 #include "dados.h"
 
-void limpar_buffer_entrada() {
+/* Limpa caracteres pendentes na entrada para evitar leituras indevidas. */
+void limpar_entrada() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
         /* limpa o que sobrou na entrada */
     }
 }
 
+/* Exibe o menu principal e retorna a opcao escolhida pelo usuario. */
 int menu_principal() {
     int opcao;
 
@@ -27,22 +28,43 @@ int menu_principal() {
     if (scanf("%d", &opcao) != 1) {
         opcao = 2;
     }
-    limpar_buffer_entrada();
+    limpar_entrada();
 
     return opcao;
 }
 
-int menu_num_jogadores() {
-    printf("\n================================\n");
-    printf("      MODO FIXO DE PARTIDA      \n");
-    printf("================================\n");
-    printf("Esta partida sempre usa %d jogadores.\n", 4);
-
-    return 4;
+/* Exibe a mensagem de encerramento do jogo. */
+void exibir_mensagem_saida() {
+    printf("\nAte mais! Obrigado por jogar QUACK QUIZ!\n");
 }
 
+/* Define o numero de jogadores da partida atual. */
+int menu_num_jogadores() {
+    int quantidade;
+    int leitura;
+
+    printf("\n================================\n");
+    printf("      NUMERO DE JOGADORES       \n");
+    printf("================================\n");
+    while (1) {
+        printf("Escolha entre 2 e 4 jogadores: ");
+        leitura = scanf("%d", &quantidade);
+        limpar_entrada();
+
+        if (leitura == 1 && quantidade >= 2 && quantidade <= 4) {
+            break;
+        }
+
+        printf("Opcao invalida! Digite um numero entre 2 e 4.\n");
+    }
+
+    return quantidade;
+}
+
+/* Exibe menu de personagens e retorna o personagem escolhido. */
 int menu_personagem(int jogador_num) {
     int personagem;
+    int leitura;
 
     printf("\n================================\n");
     printf("  JOGADOR %d - SELECIONE SEU PERSONAGEM!\n", jogador_num);
@@ -52,27 +74,33 @@ int menu_personagem(int jogador_num) {
     printf("3. Tio Patinhas\n");
     printf("4. Pato\n");
     printf("--------------------------------\n");
-    printf("Digite sua opcao: ");
-    if (scanf("%d", &personagem) != 1) {
-        personagem = 1;
-    }
-    limpar_buffer_entrada();
+    while (1) {
+        printf("Digite sua opcao: ");
+        leitura = scanf("%d", &personagem);
+        limpar_entrada();
 
-    if (personagem < 1 || personagem > 4) personagem = 1;
+        if (leitura == 1 && personagem >= 1 && personagem <= 4) {
+            break;
+        }
+
+        printf("Resposta invalida! Digite um numero entre 1 e 4.\n");
+    }
 
     return personagem;
 }
 
-void nome_personagem(int id, char *buffer) {
+/* Converte o id do personagem para o nome exibido no jogo. */
+void nome_personagem(int id, char nome_saida[]) {
     switch(id) {
-        case 1: snprintf(buffer, 50, "Patolino"); break;
-        case 2: snprintf(buffer, 50, "Pato Donald"); break;
-        case 3: snprintf(buffer, 50, "Tio Patinhas"); break;
-        case 4: snprintf(buffer, 50, "Pato"); break;
-        default: snprintf(buffer, 50, "Desconhecido"); break;
+        case 1: copiar_texto(nome_saida, 50, "Patolino"); break;
+        case 2: copiar_texto(nome_saida, 50, "Pato Donald"); break;
+        case 3: copiar_texto(nome_saida, 50, "Tio Patinhas"); break;
+        case 4: copiar_texto(nome_saida, 50, "Pato"); break;
+        default: copiar_texto(nome_saida, 50, "Desconhecido"); break;
     }
 }
 
+/* Menu de pausa ao fim do turno. */
 int menu_pause() {
     int opcao;
 
@@ -87,7 +115,7 @@ int menu_pause() {
     if (scanf("%d", &opcao) != 1) {
         opcao = 1;
     }
-    limpar_buffer_entrada();
+    limpar_entrada();
 
     if (opcao < 1 || opcao > 3) {
         opcao = 1;
@@ -96,6 +124,7 @@ int menu_pause() {
     return opcao;
 }
 
+/* Exibe o placar com a posicao atual de cada jogador. */
 void exibir_placar(tp_player jogadores[], int num_jogadores) {
     int i;
 
@@ -105,26 +134,27 @@ void exibir_placar(tp_player jogadores[], int num_jogadores) {
     }
 }
 
+/* Configura jogadores, nomes e fila de turnos no inicio da partida. */
 void configurar_jogadores(tp_player jogadores[], tp_fila *fila_turnos, int num_jogadores) {
     int i, personagem;
-    char nome_pers[50];
+    char nome_personagem_escolhido[50];
 
     printf("\n================================\n");
     printf("   SELECIONANDO PERSONAGENS     \n");
     printf("================================\n");
 
     inicializar_jogadores(jogadores, 4);
-    inicializa_fila(fila_turnos);
 
     for (i = 0; i < num_jogadores; i++) {
         personagem = menu_personagem(i + 1);
-        nome_personagem(personagem, nome_pers);
-        snprintf(jogadores[i].nome, sizeof(jogadores[i].nome), "Jogador %d (%s)", i + 1, nome_pers);
-        printf("\n%s selecionado!\n", jogadores[i].nome);
-        insere_fila(fila_turnos, jogadores[i].id_player);
+        nome_personagem(personagem, nome_personagem_escolhido);
+        printf("\n%s selecionou %s!\n", jogadores[i].nome, nome_personagem_escolhido);
     }
+
+    colocar_jogadores_na_fila(jogadores, num_jogadores, fila_turnos);
 }
 
+/* Exibe resumo inicial da partida e quantidade de cartas carregadas. */
 void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_pilha *pilha_cartas) {
     int i;
 
@@ -138,6 +168,92 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_pilha *p
     printf("\nCartas carregadas: %d cartas\n", tamanho_pilha_cartas(pilha_cartas));
 }
 
+/* Exibe cabecalho visual da rodada e dados do jogador da vez. */
+void exibir_turno_jogador(tp_player jogadores[], int jogador_atual, int rodada) {
+    printf("\n========================================\n");
+    printf("           RODADA %d                     \n", rodada);
+    printf("========================================\n");
+    printf("Vez de: %s\n", jogadores[jogador_atual].nome);
+    printf("Posicao atual: Casa %d\n", jogadores[jogador_atual].posicao);
+    printf("----------------------------------------\n");
+}
+
+/* Exibe mensagem de avanco apos resposta correta. */
+void exibir_avanco_jogador(tp_player jogadores[], int jogador_atual) {
+    printf(
+        "\n%s avancou para a casa %d!\n",
+        jogadores[jogador_atual].nome,
+        jogadores[jogador_atual].posicao
+    );
+}
+
+/* Exibe menu visual da carta sorteada e suas alternativas. */
+void menu_carta_sorteada(tp_carta carta) {
+    int i;
+
+    printf("\n========================================\n");
+    printf("   CARTA SORTEADA! (Dificuldade %d)     \n", carta.dificuldade);
+    printf("========================================\n");
+    printf("\n%s\n\n", carta.pergunta);
+
+    for (i = 0; i < NUM_ALTERNATIVAS; i++) {
+        printf("%d) %s\n", i + 1, carta.alternativas[i]);
+    }
+}
+
+/* Coleta a resposta da carta exibida. */
+int menu_resposta_carta() {
+    int resposta;
+
+    printf("\nDigite o numero da sua resposta: ");
+    if (scanf("%d", &resposta) != 1) {
+        resposta = -1;
+    }
+    limpar_entrada();
+
+    return resposta;
+}
+
+/* Controla o fluxo visual e retorno da resposta de uma carta. */
+int fazer_pergunta(tp_pilha *pilha_cartas) {
+    tp_carta carta;
+    int resposta;
+
+    if (!sortear_carta(pilha_cartas, &carta)) {
+        return 0;
+    }
+
+    menu_carta_sorteada(carta);
+    resposta = menu_resposta_carta();
+
+    printf("\nRESPOSTA...\n");
+
+    if (resposta == carta.resposta) {
+        printf("\n*** CORRETA! ***\n");
+        printf("Voce avanca %d casa(s)!\n", carta.avanco);
+        return carta.avanco;
+    }
+
+    printf("\n*** ERRADA! ***\n");
+    printf(
+        "A resposta correta era: %d) %s\n",
+        carta.resposta,
+        carta.alternativas[carta.resposta - 1]
+    );
+
+    return 0;
+}
+
+/* Exibe tela de vitoria quando um jogador alcanca a casa final. */
+void exibir_vencedor(tp_player jogadores[], int jogador_atual) {
+    printf("\n========================================\n");
+    printf("        VENCEDOR!!!                      \n");
+    printf("========================================\n");
+    printf("%s VENCEU O JOGO!\n", jogadores[jogador_atual].nome);
+    printf("========================================\n");
+}
+
+/* Controla o fluxo completo de uma partida. */
 int executar_partida() {
     tp_player jogadores[4];
     tp_fila fila_turnos;
@@ -162,12 +278,7 @@ int executar_partida() {
         jogador_atual = id_jogador - 1;
         insere_fila(&fila_turnos, id_jogador);
 
-        printf("\n========================================\n");
-        printf("           RODADA %d                     \n", rodada);
-        printf("========================================\n");
-        printf("Vez de: %s\n", jogadores[jogador_atual].nome);
-        printf("Posicao atual: Casa %d\n", jogadores[jogador_atual].posicao);
-        printf("----------------------------------------\n");
+        exibir_turno_jogador(jogadores, jogador_atual, rodada);
         printf("Pressione ENTER para sortear uma pergunta...");
         getchar();
 
@@ -175,18 +286,10 @@ int executar_partida() {
 
         if (resultado > 0) {
             jogadores[jogador_atual].posicao += resultado;
-            printf(
-                "\n%s avancou para a casa %d!\n",
-                jogadores[jogador_atual].nome,
-                jogadores[jogador_atual].posicao
-            );
+            exibir_avanco_jogador(jogadores, jogador_atual);
 
             if (jogadores[jogador_atual].posicao >= 20) {
-                printf("\n========================================\n");
-                printf("        VENCEDOR!!!                      \n");
-                printf("========================================\n");
-                printf("%s VENCEU O JOGO!\n", jogadores[jogador_atual].nome);
-                printf("========================================\n");
+                exibir_vencedor(jogadores, jogador_atual);
                 em_jogo = 0;
                 continue;
             }

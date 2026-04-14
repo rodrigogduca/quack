@@ -2,11 +2,10 @@
 #define DADOS_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
+#include <time.h>
 
 #include "pilha.h"
+#include "fila.h"
 
 #define NUM_ALTERNATIVAS 5
 #define NUM_CARTAS 12
@@ -26,23 +25,110 @@ typedef struct {
     int id_player;
 } tp_player;
 
-void inicializar_aleatorio() {
-    unsigned int seed = (unsigned int)(uintptr_t)&seed;
-    srand(seed);
+int criar_semente_aleatoria() {
+    int marcador_local = 0;
+    int semente;
+    long endereco_local;
+
+    semente = (int)time(NULL);
+    endereco_local = (long)&marcador_local;
+    semente = semente ^ (int)endereco_local;
+
+    if (semente == 0) {
+        semente = 1u;
+    }
+
+    return semente;
 }
 
-static void copiar_texto(char *destino, size_t tamanho, const char *origem) {
-    strncpy(destino, origem, tamanho - 1);
-    destino[tamanho - 1] = '\0';
+int numero_aleatorio(int limite, int *estado) {
+    long long proximo;
+
+    if (limite <= 0 || estado == NULL) {
+        return 0;
+    }
+
+    proximo = ((long long)(*estado) * 1103515245LL) + 12345LL;
+    if (proximo < 0) {
+        proximo = -proximo;
+    }
+
+    *estado = (int)(proximo % 2147483647LL);
+    return *estado % limite;
+}
+
+void copiar_texto(char destino[], int tamanho, char origem[]) {
+    int i = 0;
+
+    if (tamanho <= 0) {
+        return;
+    }
+
+    while (i < tamanho - 1 && origem[i] != '\0') {
+        destino[i] = origem[i];
+        i++;
+    }
+
+    destino[i] = '\0';
+}
+
+void inteiro_para_texto(int valor, char texto[]) {
+    char invertido[12];
+    int i = 0;
+    int j;
+
+    if (valor == 0) {
+        texto[0] = '0';
+        texto[1] = '\0';
+        return;
+    }
+
+    while (valor > 0 && i < 11) {
+        invertido[i] = (char)('0' + (valor % 10));
+        valor /= 10;
+        i++;
+    }
+
+    for (j = 0; j < i; j++) {
+        texto[j] = invertido[i - 1 - j];
+    }
+
+    texto[i] = '\0';
+}
+
+void montar_nome_jogador(char nome_saida[], int tamanho, int indice) {
+    char prefixo[] = "Jogador ";
+    char numero[12];
+    int i = 0;
+    int j = 0;
+
+    if (tamanho <= 0) {
+        return;
+    }
+
+    inteiro_para_texto(indice, numero);
+
+    while (i < tamanho - 1 && prefixo[i] != '\0') {
+        nome_saida[i] = prefixo[i];
+        i++;
+    }
+
+    while (i < tamanho - 1 && numero[j] != '\0') {
+        nome_saida[i] = numero[j];
+        i++;
+        j++;
+    }
+
+    nome_saida[i] = '\0';
 }
 
 tp_carta criar_carta(
-    const char *perg,
-    const char *alt1,
-    const char *alt2,
-    const char *alt3,
-    const char *alt4,
-    const char *alt5,
+    char perg[],
+    char alt1[],
+    char alt2[],
+    char alt3[],
+    char alt4[],
+    char alt5[],
     int resp,
     int avanc,
     int dif,
@@ -192,15 +278,28 @@ void inicializar_jogadores(tp_player jogadores[], int quantidade) {
 
     for (i = 0; i < quantidade; i++) {
         jogadores[i].posicao = 1;
-        snprintf(jogadores[i].nome, sizeof(jogadores[i].nome), "Player %d", i + 1);
+        montar_nome_jogador(jogadores[i].nome, sizeof(jogadores[i].nome), i + 1);
         jogadores[i].id_player = i + 1;
+    }
+}
+
+void colocar_jogadores_na_fila(tp_player jogadores[], int quantidade, tp_fila *fila_turnos) {
+    int i;
+
+    inicializa_fila(fila_turnos);
+
+    for (i = 0; i < quantidade; i++) {
+        insere_fila(fila_turnos, jogadores[i].id_player);
     }
 }
 
 void carregar_perguntas(tp_pilha *pilha_cartas) {
     int i, j;
+    int estado;
     tp_item ids[NUM_CARTAS];
     tp_item aux;
+
+    estado = criar_semente_aleatoria();
 
     inicializa_pilha(pilha_cartas);
 
@@ -209,7 +308,7 @@ void carregar_perguntas(tp_pilha *pilha_cartas) {
     }
 
     for (i = NUM_CARTAS - 1; i > 0; i--) {
-        j = rand() % (i + 1);
+        j = numero_aleatorio(i + 1, &estado);
         aux = ids[i];
         ids[i] = ids[j];
         ids[j] = aux;
@@ -224,11 +323,9 @@ int tamanho_pilha_cartas(tp_pilha *pilha_cartas) {
     return altura_pilha(pilha_cartas);
 }
 
-int fazer_pergunta(tp_pilha *pilha_cartas) {
+int sortear_carta(tp_pilha *pilha_cartas, tp_carta *carta_sorteada) {
     tp_carta banco_cartas[NUM_CARTAS];
     tp_item id_carta;
-    tp_carta carta;
-    int i, resposta;
 
     montar_banco_cartas(banco_cartas);
 
@@ -245,41 +342,8 @@ int fazer_pergunta(tp_pilha *pilha_cartas) {
         return 0;
     }
 
-    carta = banco_cartas[id_carta];
-
-    printf("\n========================================\n");
-    printf("   CARTA SORTEADA! (Dificuldade %d)     \n", carta.dificuldade);
-    printf("========================================\n");
-    printf("\n%s\n\n", carta.pergunta);
-
-    for (i = 0; i < NUM_ALTERNATIVAS; i++) {
-        printf("%d) %s\n", i + 1, carta.alternativas[i]);
-    }
-
-    printf("\nDigite o numero da sua resposta: ");
-    if (scanf("%d", &resposta) != 1) {
-        resposta = -1;
-    }
-
-    while ((i = getchar()) != '\n' && i != EOF) {
-        /* limpa buffer de entrada */
-    }
-
-    printf("\nRESPOSTA...\n");
-
-    if (resposta == carta.resposta) {
-        printf("\n*** CORRETA! ***\n");
-        printf("Voce avanca %d casa(s)!\n", carta.avanco);
-        return carta.avanco;
-    }
-
-    printf("\n*** ERRADA! ***\n");
-    printf(
-        "A resposta correta era: %d) %s\n",
-        carta.resposta,
-        carta.alternativas[carta.resposta - 1]
-    );
-    return 0;
+    *carta_sorteada = banco_cartas[id_carta];
+    return 1;
 }
 
 #endif

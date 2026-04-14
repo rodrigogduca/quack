@@ -31,21 +31,23 @@ gcc -o quack main.c
 | Arquivo | Descrição |
 |---------|-----------|
 | `main.c` | Loop principal do jogo |
-| `dados.h` | Cartas, jogadores, pilha de cartas e perguntas |
-| `menu.h` | Funções dos menus (principal, personagem, pause) |
+| `dados.h` | Estruturas de dados, banco de cartas, embaralhamento e sorteio de carta |
+| `menu.h` | Menus do jogo (principal, personagem, pause, carta sorteada) e fluxo da partida |
 | `pilha.h` | Implementação de Pilha (LIFO) |
 | `fila.h` | Implementação de Fila (FIFO) |
+| `listase.h` | Implementação da Lista Simplesmente Encadeada |
 
 ## 🔧 Estruturas de Dados Utilizadas
 
 ### Fila (`tp_fila`)
 - Controla a ordem dos turnos dos jogadores
 - Implementação circular (FIFO)
+- Jogadores são colocados na fila pela função `colocar_jogadores_na_fila` (em `dados.h`)
 
 ### Pilha de Cartas (`tp_pilha_cartas`)
-- Armazena as cartas de perguntas por dificuldade
-- 3 pilhas separadas: fácil, médio, difícil
-- Embaralhamento usando Fisher-Yates
+- Armazena os IDs das cartas disponíveis para sorteio
+- Usa embaralhamento estilo Fisher-Yates para evitar repetição imediata
+- Quando a pilha acaba, o jogo recarrega e embaralha novamente
 
 ### Estruturas Personalizadas
 - `tp_player`: Dados do jogador (posição, nome, ID)
@@ -59,6 +61,11 @@ gcc -o quack main.c
 - **Dificuldade 3**: Avança 3 casas (4 perguntas)
 - Perguntas não se repetem até todas serem usadas
 - Alternativas armazenadas em matriz `char[5][150]`
+
+### Organização da Carta Sorteada
+- `dados.h`: sorteia e devolve a carta com `sortear_carta`
+- `menu.h`: exibe a carta e coleta a resposta com `menu_carta_sorteada` e `menu_resposta_carta`
+- `menu.h`: valida acerto/erro e retorno de avanço com `fazer_pergunta`
 
 ## 🦆 Personagens
 
