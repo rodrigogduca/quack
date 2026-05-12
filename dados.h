@@ -6,7 +6,7 @@
 // Modelos do jogo, utilitarios e banco de perguntas.
 
 #include <stdio.h>
-#include <time.h>
+#include <stdlib.h>
 
 #include "config.h"
 #include "pilha.h"
@@ -28,20 +28,17 @@ typedef struct {
     int id_player; // Identificador de turno (1..4).
 } tp_player;
 
-// Gera uma semente basica para o gerador pseudo-aleatorio.
+// Gera uma semente automatica usando variacoes de endereco em memoria.
 int criar_semente_aleatoria() {
     int marcador_local = 0;
-    int semente;
-    long endereco_local;
-
-    // Mistura tempo atual com endereco de uma variavel local.
-    semente = (int)time(NULL);
-    endereco_local = (long)&marcador_local;
-    semente = semente ^ (int)endereco_local;
+    size_t addr = (size_t)&marcador_local;
+    size_t shift = sizeof(size_t) * 4;
+    size_t mix = addr ^ (addr >> shift);
+    int semente = (int)(mix & 0x7fffffff);
 
     // Evita estado nulo no gerador.
     if (semente == 0) {
-        semente = 1u;
+        semente = 1;
     }
 
     return semente;
