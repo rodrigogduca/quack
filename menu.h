@@ -3,8 +3,11 @@
 
 #include <stdio.h>
 
+#include "config.h"
 #include "fila.h"
 #include "dados.h"
+#include "tabuleiro.h"
+#include "estatisticas.h"
 
 /* Limpa caracteres pendentes na entrada para evitar leituras indevidas. */
 void limpar_entrada() {
@@ -125,12 +128,23 @@ int menu_pause() {
 }
 
 /* Exibe o placar com a posicao atual de cada jogador. */
-void exibir_placar(tp_player jogadores[], int num_jogadores) {
+void exibir_placar(tp_player jogadores[], int num_jogadores, tp_tabuleiro *tabuleiro) {
     int i;
+    tp_casa *casa;
 
     printf("\n--- PLACAR ---\n");
     for (i = 0; i < num_jogadores; i++) {
-        printf("%s: Casa %d\n", jogadores[i].nome, jogadores[i].posicao);
+        casa = obter_casa(tabuleiro, jogadores[i].posicao);
+        if (casa != NULL) {
+            printf(
+                "%s: Casa %d (Unidade %d)\n",
+                jogadores[i].nome,
+                jogadores[i].posicao,
+                casa->unidade
+            );
+        } else {
+            printf("%s: Casa %d\n", jogadores[i].nome, jogadores[i].posicao);
+        }
     }
 }
 
@@ -143,7 +157,7 @@ void configurar_jogadores(tp_player jogadores[], tp_fila *fila_turnos, int num_j
     printf("   SELECIONANDO PERSONAGENS     \n");
     printf("================================\n");
 
-    inicializar_jogadores(jogadores, 4);
+    inicializar_jogadores(jogadores, num_jogadores);
 
     for (i = 0; i < num_jogadores; i++) {
         personagem = menu_personagem(i + 1);
@@ -154,8 +168,8 @@ void configurar_jogadores(tp_player jogadores[], tp_fila *fila_turnos, int num_j
     colocar_jogadores_na_fila(jogadores, num_jogadores, fila_turnos);
 }
 
-/* Exibe resumo inicial da partida e quantidade de cartas carregadas. */
-void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_pilha *pilha_cartas) {
+/* Exibe resumo inicial da partida e configuracoes do tabuleiro. */
+void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_tabuleiro *tabuleiro) {
     int i;
 
     printf("\n================================\n");
@@ -165,7 +179,8 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_pilha *p
     for (i = 0; i < num_jogadores; i++) {
         printf("  - %s (Casa %d)\n", jogadores[i].nome, jogadores[i].posicao);
     }
-    printf("\nCartas carregadas: %d cartas\n", tamanho_pilha_cartas(pilha_cartas));
+    printf("\nTabuleiro: %d casas (%d por unidade)\n", tabuleiro->total, CASAS_POR_UNIDADE);
+    printf("Perguntas carregadas: %d (6 por unidade)\n", TOTAL_PERGUNTAS);
 }
 
 /* Exibe cabecalho visual da rodada e dados do jogador da vez. */
@@ -187,12 +202,21 @@ void exibir_avanco_jogador(tp_player jogadores[], int jogador_atual) {
     );
 }
 
+/* Exibe mensagem de recuo quando o jogador sofre penalidade. */
+void exibir_recuo_jogador(tp_player jogadores[], int jogador_atual) {
+    printf(
+        "\n%s recuou para a casa %d!\n",
+        jogadores[jogador_atual].nome,
+        jogadores[jogador_atual].posicao
+    );
+}
+
 /* Exibe menu visual da carta sorteada e suas alternativas. */
 void menu_carta_sorteada(tp_carta carta) {
     int i;
 
     printf("\n========================================\n");
-    printf("   CARTA SORTEADA! (Dificuldade %d)     \n", carta.dificuldade);
+    printf(" CARTA SORTEADA! (Unidade %d - Dificuldade %d)\n", carta.unidade, carta.dificuldade);
     printf("========================================\n");
     printf("\n%s\n\n", carta.pergunta);
 
@@ -215,11 +239,26 @@ int menu_resposta_carta() {
 }
 
 /* Controla o fluxo visual e retorno da resposta de uma carta. */
-int fazer_pergunta(tp_pilha *pilha_cartas) {
+int fazer_pergunta(
+    tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
+    tp_carta banco[],
+    int total,
+    int unidade,
+    int *estado,
+    int *acertou
+) {
     tp_carta carta;
     int resposta;
+    int dificuldade;
 
-    if (!sortear_carta(pilha_cartas, &carta)) {
+    if (acertou != NULL) {
+        *acertou = 0;
+    }
+
+    dificuldade = sortear_dificuldade(estado);
+    printf("\nDificuldade sorteada: %d\n", dificuldade);
+
+    if (!sortear_carta(pilhas, banco, total, unidade, dificuldade, estado, &carta)) {
         return 0;
     }
 
@@ -229,6 +268,9 @@ int fazer_pergunta(tp_pilha *pilha_cartas) {
     printf("\nRESPOSTA...\n");
 
     if (resposta == carta.resposta) {
+        if (acertou != NULL) {
+            *acertou = 1;
+        }
         printf("\n*** CORRETA! ***\n");
         printf("Voce avanca %d casa(s)!\n", carta.avanco);
         return carta.avanco;
@@ -240,8 +282,9 @@ int fazer_pergunta(tp_pilha *pilha_cartas) {
         carta.resposta,
         carta.alternativas[carta.resposta - 1]
     );
+    printf("Penalidade: retorna %d casa(s).\n", PENALIDADE_ERRO);
 
-    return 0;
+    return -PENALIDADE_ERRO;
 }
 
 /* Exibe tela de vitoria quando um jogador alcanca a casa final. */
@@ -253,22 +296,49 @@ void exibir_vencedor(tp_player jogadores[], int jogador_atual) {
     printf("========================================\n");
 }
 
+/* Exibe a posicao atual do jogador e a unidade correspondente. */
+void exibir_posicao_atual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int jogador_atual) {
+    tp_casa *casa = obter_casa(tabuleiro, jogadores[jogador_atual].posicao);
+
+    if (casa != NULL) {
+        printf("Parou na casa %d (Unidade %d)\n", casa->numero, casa->unidade);
+    } else {
+        printf("Parou na casa %d\n", jogadores[jogador_atual].posicao);
+    }
+}
+
 /* Controla o fluxo completo de uma partida. */
 int executar_partida() {
     tp_player jogadores[4];
     tp_fila fila_turnos;
-    tp_pilha pilha_cartas;
+    tp_pilha pilhas_perguntas[NUM_UNIDADES][NUM_DIFICULDADES];
+    tp_carta banco[TOTAL_PERGUNTAS];
+    tp_tabuleiro tabuleiro;
+    tp_no_est *estatisticas = NULL;
     tp_item id_jogador;
-    int num_jogadores, jogador_atual, rodada, resultado, pausa;
+    int num_jogadores, jogador_atual, rodada, pausa;
     int em_jogo = 1;
+    int retorno_menu = 1;
+    int turnos = 0;
+    int dado;
+    int delta;
+    int acertou;
+    int estado = criar_semente_aleatoria();
+    tp_casa *casa;
 
     num_jogadores = menu_num_jogadores();
 
     configurar_jogadores(jogadores, &fila_turnos, num_jogadores);
-    carregar_perguntas(&pilha_cartas);
-    exibir_inicio_partida(jogadores, num_jogadores, &pilha_cartas);
 
-    rodada = 1;
+    if (!criar_tabuleiro(&tabuleiro)) {
+        printf("\nErro ao criar tabuleiro. Voltando ao menu.\n");
+        return 1;
+    }
+
+    inicializar_estatisticas(&estatisticas, tabuleiro.total);
+    montar_banco_cartas(banco);
+    carregar_perguntas(pilhas_perguntas, banco, TOTAL_PERGUNTAS, &estado);
+    exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
 
     while (em_jogo) {
         if (!remove_fila(&fila_turnos, &id_jogador)) {
@@ -278,38 +348,103 @@ int executar_partida() {
         jogador_atual = id_jogador - 1;
         insere_fila(&fila_turnos, id_jogador);
 
+        turnos++;
+        rodada = ((turnos - 1) / num_jogadores) + 1;
+
         exibir_turno_jogador(jogadores, jogador_atual, rodada);
-        printf("Pressione ENTER para sortear uma pergunta...");
+        printf("Pressione ENTER para rolar o dado...");
         getchar();
 
-        resultado = fazer_pergunta(&pilha_cartas);
+        dado = rolar_dado(&estado);
+        printf("Dado sorteado: %d\n", dado);
 
-        if (resultado > 0) {
-            jogadores[jogador_atual].posicao += resultado;
-            exibir_avanco_jogador(jogadores, jogador_atual);
+        jogadores[jogador_atual].posicao = mover_posicao(
+            &tabuleiro,
+            jogadores[jogador_atual].posicao,
+            dado
+        );
+        registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
+        exibir_posicao_atual(&tabuleiro, jogadores, jogador_atual);
 
-            if (jogadores[jogador_atual].posicao >= 20) {
-                exibir_vencedor(jogadores, jogador_atual);
-                em_jogo = 0;
-                continue;
-            }
+        if (jogadores[jogador_atual].posicao >= tabuleiro.total) {
+            exibir_vencedor(jogadores, jogador_atual);
+            em_jogo = 0;
+            break;
         }
 
-        exibir_placar(jogadores, num_jogadores);
+        casa = obter_casa(&tabuleiro, jogadores[jogador_atual].posicao);
+
+        if (casa != NULL && casa->tipo == CASA_PERGUNTA) {
+            acertou = 0;
+            delta = fazer_pergunta(
+                pilhas_perguntas,
+                banco,
+                TOTAL_PERGUNTAS,
+                casa->unidade,
+                &estado,
+                &acertou
+            );
+            registrar_resultado(&estatisticas, casa->numero, acertou);
+            if (delta != 0) {
+                jogadores[jogador_atual].posicao = mover_posicao(
+                    &tabuleiro,
+                    jogadores[jogador_atual].posicao,
+                    delta
+                );
+                registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
+                if (delta > 0) {
+                    exibir_avanco_jogador(jogadores, jogador_atual);
+                } else {
+                    exibir_recuo_jogador(jogadores, jogador_atual);
+                }
+            }
+        } else if (casa != NULL && casa->tipo == CASA_AVANCO) {
+            printf("Casa bonus! Avance %d casa(s).\n", casa->efeito);
+            jogadores[jogador_atual].posicao = mover_posicao(
+                &tabuleiro,
+                jogadores[jogador_atual].posicao,
+                casa->efeito
+            );
+            registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
+            exibir_avanco_jogador(jogadores, jogador_atual);
+        } else if (casa != NULL && casa->tipo == CASA_RECUO) {
+            printf("Casa de penalidade! Retorne %d casa(s).\n", casa->efeito);
+            jogadores[jogador_atual].posicao = mover_posicao(
+                &tabuleiro,
+                jogadores[jogador_atual].posicao,
+                -casa->efeito
+            );
+            registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
+            exibir_recuo_jogador(jogadores, jogador_atual);
+        }
+
+        if (jogadores[jogador_atual].posicao >= tabuleiro.total) {
+            exibir_vencedor(jogadores, jogador_atual);
+            em_jogo = 0;
+            break;
+        }
+
+        exibir_placar(jogadores, num_jogadores, &tabuleiro);
         pausa = menu_pause();
 
         if (pausa == 2) {
             em_jogo = 0;
+            retorno_menu = 1;
         } else if (pausa == 3) {
-            return 0;
-        }
-
-        if (jogador_atual == num_jogadores - 1) {
-            rodada++;
+            em_jogo = 0;
+            retorno_menu = 0;
         }
     }
 
-    return 1;
+    if (salvar_relatorio(estatisticas, "relatorio.txt")) {
+        printf("\nRelatorio salvo em relatorio.txt\n");
+    } else {
+        printf("\nNao foi possivel salvar o relatorio.\n");
+    }
+
+    liberar_estatisticas(estatisticas);
+    destruir_tabuleiro(&tabuleiro);
+    return retorno_menu;
 }
 
 #endif

@@ -4,15 +4,16 @@ Jogo de tabuleiro educativo desenvolvido em C para a disciplina de **Algoritmos 
 
 ## 📖 Sobre o Jogo
 
-Quack Quiz é um jogo de perguntas e respostas onde os jogadores competem para chegar primeiro à casa 20 do tabuleiro. Cada jogador escolhe um personagem de pato e responde perguntas sobre programação em C e estruturas de dados.
+Quack Quiz é um jogo de perguntas e respostas onde os jogadores competem para chegar primeiro à casa 30 do tabuleiro. Cada jogador escolhe um personagem de pato, rola um dado e enfrenta casas especiais e perguntas sobre programação em C e estruturas de dados.
 
 ## 🎮 Como Jogar
 
 1. Escolha o número de jogadores (2-4)
 2. Cada jogador seleciona seu personagem
-3. Na sua vez, uma pergunta é sorteada aleatoriamente
-4. Acertou? Avança no tabuleiro! Errou? Fica na mesma casa
-5. Primeiro a chegar na casa 20 vence!
+3. Na sua vez, role o dado (1-6) e avance no tabuleiro
+4. Se cair em casa de pergunta, responda e receba avancos ou penalidades
+5. Casas especiais podem avancar ou recuar sua posicao
+6. Primeiro a chegar na casa 30 vence!
 
 ## 🏃 Executando
 
@@ -31,11 +32,14 @@ gcc -o quack main.c
 | Arquivo | Descrição |
 |---------|-----------|
 | `main.c` | Loop principal do jogo |
-| `dados.h` | Estruturas de dados, banco de cartas, embaralhamento e sorteio de carta |
-| `menu.h` | Menus do jogo (principal, personagem, pause, carta sorteada) e fluxo da partida |
-| `pilha.h` | Implementação de Pilha (LIFO) |
-| `fila.h` | Implementação de Fila (FIFO) |
-| `listase.h` | Implementação da Lista Simplesmente Encadeada |
+| `config.h` | Constantes do jogo (tabuleiro, perguntas, penalidades) |
+| `dados.h` | Estruturas de dados, banco de perguntas por unidade e embaralhamento |
+| `menu.h` | Menus do jogo e fluxo completo da partida |
+| `tabuleiro.h` | Tabuleiro dinamico e casas especiais |
+| `estatisticas.h` | Arvore de estatisticas e relatorio em disco |
+| `pilha.h` | Implementacao de Pilha (LIFO) |
+| `fila.h` | Implementacao de Fila (FIFO) |
+| `listase.h` | Implementacao da Lista Simplesmente Encadeada |
 
 ## 🔧 Estruturas de Dados Utilizadas
 
@@ -44,10 +48,17 @@ gcc -o quack main.c
 - Implementação circular (FIFO)
 - Jogadores são colocados na fila pela função `colocar_jogadores_na_fila` (em `dados.h`)
 
-### Pilha de Cartas (`tp_pilha_cartas`)
-- Armazena os IDs das cartas disponíveis para sorteio
-- Usa embaralhamento estilo Fisher-Yates para evitar repetição imediata
-- Quando a pilha acaba, o jogo recarrega e embaralha novamente
+### Pilhas de Perguntas (`tp_pilha`)
+- Organizadas por unidade e dificuldade
+- Usa embaralhamento estilo Fisher-Yates para evitar repeticao imediata
+- Quando uma pilha esgota, o conjunto e reembaralhado
+
+### Tabuleiro Dinamico (`tp_tabuleiro`)
+- Lista duplamente encadeada com 30 casas (10 por unidade)
+- Permite navegacao para frente e para tras
+
+### Estatisticas (`tp_no_est`)
+- Arvore binaria de busca para registrar visitas, acertos e erros por casa
 
 ### Estruturas Personalizadas
 - `tp_player`: Dados do jogador (posição, nome, ID)
@@ -55,12 +66,13 @@ gcc -o quack main.c
 
 ## 🎯 Sistema de Perguntas
 
-- **12 perguntas** divididas em 3 níveis de dificuldade
-- **Dificuldade 1**: Avança 1 casa (4 perguntas)
-- **Dificuldade 2**: Avança 2 casas (4 perguntas)
-- **Dificuldade 3**: Avança 3 casas (4 perguntas)
-- Perguntas não se repetem até todas serem usadas
-- Alternativas armazenadas em matriz `char[5][150]`
+- **18 perguntas** (6 por unidade) com 3 niveis de dificuldade
+- **Facil**: avanca 1 casa
+- **Media**: avanca 2 casas
+- **Dificil**: avanca 3 casas
+- A dificuldade e sorteada quando o jogador cai em uma casa de pergunta
+- Cada unidade possui suas pilhas independentes por dificuldade
+- Perguntas nao se repetem ate a pilha esgotar
 
 ### Organização da Carta Sorteada
 - `dados.h`: sorteia e devolve a carta com `sortear_carta`
@@ -73,6 +85,11 @@ gcc -o quack main.c
 2. Pato Donald
 3. Tio Patinhas
 4. Pato
+
+## 📊 Registro de Estatisticas
+
+- Cada casa registra visitas, acertos e erros
+- O relatorio e salvo em `relatorio.txt` ao final da partida
 
 ## 👥 Equipe Quack
 
