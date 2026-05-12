@@ -198,6 +198,69 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_tabuleir
     printf("Perguntas carregadas: %d (6 por unidade)\n", TOTAL_PERGUNTAS);
 }
 
+// Exibe o tabuleiro em formato visual com jogadores e casas especiais.
+void exibir_tabuleiro_visual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int num_jogadores) {
+    int pos;
+    int row_start;
+    int row_end;
+    int i;
+    tp_casa *casa;
+
+    if (tabuleiro == NULL) {
+        return;
+    }
+
+    printf("\nTABULEIRO (numero / jogadores / tipo)\n");
+
+    for (row_start = 1; row_start <= tabuleiro->total; row_start += CASAS_POR_UNIDADE) {
+        row_end = row_start + CASAS_POR_UNIDADE - 1;
+        if (row_end > tabuleiro->total) {
+            row_end = tabuleiro->total;
+        }
+
+        // Linha 1: numeros das casas.
+        for (pos = row_start; pos <= row_end; pos++) {
+            printf("[%02d]", pos);
+        }
+        printf("\n");
+
+        // Linha 2: jogadores presentes em cada casa.
+        for (pos = row_start; pos <= row_end; pos++) {
+            char ocupacao[4] = {'.', '.', '.', '.'};
+            int indice = 0;
+
+            for (i = 0; i < num_jogadores; i++) {
+                if (jogadores[i].posicao == pos && indice < 4) {
+                    ocupacao[indice] = (char)('1' + i);
+                    indice++;
+                }
+            }
+
+            printf("%c%c%c%c", ocupacao[0], ocupacao[1], ocupacao[2], ocupacao[3]);
+        }
+        printf("\n");
+
+        // Linha 3: tipo de casa (P=pergunta, A=avanco, R=recuo, .=normal).
+        for (pos = row_start; pos <= row_end; pos++) {
+            char tipo[4] = {'.', '.', '.', '.'};
+
+            casa = obter_casa(tabuleiro, pos);
+            if (casa != NULL) {
+                if (casa->tipo == CASA_PERGUNTA) {
+                    tipo[0] = 'P';
+                } else if (casa->tipo == CASA_AVANCO) {
+                    tipo[0] = 'A';
+                } else if (casa->tipo == CASA_RECUO) {
+                    tipo[0] = 'R';
+                }
+            }
+
+            printf("%c%c%c%c", tipo[0], tipo[1], tipo[2], tipo[3]);
+        }
+        printf("\n\n");
+    }
+}
+
 // Exibe cabecalho visual da rodada e dados do jogador da vez.
 void exibir_turno_jogador(tp_player jogadores[], int jogador_atual, int rodada) {
     // Cabecalho visual da rodada.
@@ -342,6 +405,7 @@ int executar_partida() {
     tp_no_est *estatisticas = NULL;
     tp_item id_jogador;
     int num_jogadores, jogador_atual, rodada, pausa;
+    int deseja_pausa;
     int em_jogo = 1;
     int retorno_menu = 1;
     int turnos = 0;
@@ -366,6 +430,7 @@ int executar_partida() {
     montar_banco_cartas(banco);
     carregar_perguntas(pilhas_perguntas, banco, TOTAL_PERGUNTAS, &estado);
     exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
+    exibir_tabuleiro_visual(&tabuleiro, jogadores, num_jogadores);
 
     // Loop principal de rodadas.
     while (em_jogo) {
@@ -453,6 +518,9 @@ int executar_partida() {
             exibir_recuo_jogador(jogadores, jogador_atual);
         }
 
+        // Mostra o tabuleiro apos aplicar os efeitos da casa.
+        exibir_tabuleiro_visual(&tabuleiro, jogadores, num_jogadores);
+
         // Verifica vitoria apos efeitos das casas.
         if (jogadores[jogador_atual].posicao >= tabuleiro.total) {
             exibir_vencedor(jogadores, jogador_atual);
@@ -462,7 +530,18 @@ int executar_partida() {
 
         // Encerramento do turno e decisao do jogador.
         exibir_placar(jogadores, num_jogadores, &tabuleiro);
-        pausa = menu_pause();
+        // Abre o menu de pausa apenas se o jogador solicitar.
+        printf("Deseja abrir o menu de pausa? (1-Sim / 2-Nao): ");
+        if (scanf("%d", &deseja_pausa) != 1) {
+            deseja_pausa = 2;
+        }
+        limpar_entrada();
+
+        if (deseja_pausa == 1) {
+            pausa = menu_pause();
+        } else {
+            pausa = 1;
+        }
 
         if (pausa == 2) {
             em_jogo = 0;
