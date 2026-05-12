@@ -1,6 +1,10 @@
 #ifndef DADOS_H
 #define DADOS_H
 
+// dados.h
+// ---------------------------------------------------------------------------
+// Modelos do jogo, utilitarios e banco de perguntas.
+
 #include <stdio.h>
 #include <time.h>
 
@@ -9,30 +13,33 @@
 #include "fila.h"
 
 typedef struct {
-    char pergunta[300];
-    char alternativas[NUM_ALTERNATIVAS][150];
-    int resposta;
-    int avanco;
-    int dificuldade;
-    int unidade;
-    int id_carta;
+    char pergunta[300]; // Enunciado da pergunta.
+    char alternativas[NUM_ALTERNATIVAS][150]; // Alternativas numeradas.
+    int resposta; // Alternativa correta (1..NUM_ALTERNATIVAS).
+    int avanco; // Casas a avancar se acertar.
+    int dificuldade; // Nivel 1..NUM_DIFICULDADES.
+    int unidade; // Unidade associada (1..NUM_UNIDADES).
+    int id_carta; // Identificador interno da carta.
 } tp_carta;
 
 typedef struct {
-    int posicao;
-    char nome[50];
-    int id_player;
+    int posicao; // Casa atual no tabuleiro.
+    char nome[50]; // Nome exibido no jogo.
+    int id_player; // Identificador de turno (1..4).
 } tp_player;
 
+// Gera uma semente basica para o gerador pseudo-aleatorio.
 int criar_semente_aleatoria() {
     int marcador_local = 0;
     int semente;
     long endereco_local;
 
+    // Mistura tempo atual com endereco de uma variavel local.
     semente = (int)time(NULL);
     endereco_local = (long)&marcador_local;
     semente = semente ^ (int)endereco_local;
 
+    // Evita estado nulo no gerador.
     if (semente == 0) {
         semente = 1u;
     }
@@ -40,39 +47,50 @@ int criar_semente_aleatoria() {
     return semente;
 }
 
+// Gerador linear congruente usando estado externo.
 int numero_aleatorio(int limite, int *estado) {
     long long proximo;
 
+    // Valida o limite e o ponteiro do estado.
     if (limite <= 0 || estado == NULL) {
         return 0;
     }
 
+    // Atualiza o estado usando parametros classicos do LCG.
     proximo = ((long long)(*estado) * 1103515245LL) + 12345LL;
     if (proximo < 0) {
         proximo = -proximo;
     }
 
+    // Reduz o estado ao intervalo e retorna modulo do limite.
     *estado = (int)(proximo % 2147483647LL);
     return *estado % limite;
 }
 
+// Rola dado virtual (1..6).
 int rolar_dado(int *estado) {
+    // Converte faixa 0..5 para 1..6.
     int valor = numero_aleatorio(6, estado);
     return valor + 1;
 }
 
+// Sorteia dificuldade (1..NUM_DIFICULDADES).
 int sortear_dificuldade(int *estado) {
+    // Converte faixa 0..NUM_DIFICULDADES-1 para 1..NUM_DIFICULDADES.
     int valor = numero_aleatorio(NUM_DIFICULDADES, estado);
     return valor + 1;
 }
 
+// Copia texto com limite de tamanho (inclui terminador).
 void copiar_texto(char destino[], int tamanho, char origem[]) {
     int i = 0;
 
+    // Garante espaco minimo para o terminador.
     if (tamanho <= 0) {
         return;
     }
 
+    // Copia ate o fim da origem ou o limite do destino.
     while (i < tamanho - 1 && origem[i] != '\0') {
         destino[i] = origem[i];
         i++;
@@ -81,23 +99,27 @@ void copiar_texto(char destino[], int tamanho, char origem[]) {
     destino[i] = '\0';
 }
 
+// Converte inteiro positivo para string.
 void inteiro_para_texto(int valor, char texto[]) {
     char invertido[12];
     int i = 0;
     int j;
 
+    // Caso especial para zero.
     if (valor == 0) {
         texto[0] = '0';
         texto[1] = '\0';
         return;
     }
 
+    // Gera os digitos em ordem inversa.
     while (valor > 0 && i < 11) {
         invertido[i] = (char)('0' + (valor % 10));
         valor /= 10;
         i++;
     }
 
+    // Inverte para formar a string final.
     for (j = 0; j < i; j++) {
         texto[j] = invertido[i - 1 - j];
     }
@@ -105,16 +127,19 @@ void inteiro_para_texto(int valor, char texto[]) {
     texto[i] = '\0';
 }
 
+// Monta nome padrao "Jogador N".
 void montar_nome_jogador(char nome_saida[], int tamanho, int indice) {
     char prefixo[] = "Jogador ";
     char numero[12];
     int i = 0;
     int j = 0;
 
+    // Garante tamanho valido do buffer.
     if (tamanho <= 0) {
         return;
     }
 
+    // Converte o indice para string.
     inteiro_para_texto(indice, numero);
 
     while (i < tamanho - 1 && prefixo[i] != '\0') {
@@ -131,6 +156,7 @@ void montar_nome_jogador(char nome_saida[], int tamanho, int indice) {
     nome_saida[i] = '\0';
 }
 
+// Cria uma carta e copia seus textos.
 tp_carta criar_carta(
     char perg[],
     char alt1[],
@@ -146,6 +172,7 @@ tp_carta criar_carta(
 ) {
     tp_carta c;
 
+    // Copia enunciado e alternativas para o struct.
     copiar_texto(c.pergunta, sizeof(c.pergunta), perg);
     copiar_texto(c.alternativas[0], sizeof(c.alternativas[0]), alt1);
     copiar_texto(c.alternativas[1], sizeof(c.alternativas[1]), alt2);
@@ -153,6 +180,7 @@ tp_carta criar_carta(
     copiar_texto(c.alternativas[3], sizeof(c.alternativas[3]), alt4);
     copiar_texto(c.alternativas[4], sizeof(c.alternativas[4]), alt5);
 
+    // Preenche metadados da carta.
     c.resposta = resp;
     c.avanco = avanc;
     c.dificuldade = dif;
@@ -162,6 +190,7 @@ tp_carta criar_carta(
     return c;
 }
 
+// Preenche o banco fixo de perguntas.
 void montar_banco_cartas(tp_carta cartas[]) {
     cartas[0] = criar_carta(
         "Qual operador realiza atribuicao em C?",
@@ -344,9 +373,11 @@ void montar_banco_cartas(tp_carta cartas[]) {
     );
 }
 
+// Inicializa posicao, nome e id de cada jogador.
 void inicializar_jogadores(tp_player jogadores[], int quantidade) {
     int i;
 
+    // Define posicao inicial e nomes padrao.
     for (i = 0; i < quantidade; i++) {
         jogadores[i].posicao = 1;
         montar_nome_jogador(jogadores[i].nome, sizeof(jogadores[i].nome), i + 1);
@@ -354,20 +385,25 @@ void inicializar_jogadores(tp_player jogadores[], int quantidade) {
     }
 }
 
+// Preenche a fila de turnos respeitando a ordem de entrada.
 void colocar_jogadores_na_fila(tp_player jogadores[], int quantidade, tp_fila *fila_turnos) {
     int i;
 
+    // Fila vazia antes de inserir a ordem dos jogadores.
     inicializa_fila(fila_turnos);
 
+    // Insere IDs em ordem de entrada.
     for (i = 0; i < quantidade; i++) {
         insere_fila(fila_turnos, jogadores[i].id_player);
     }
 }
 
+// Embaralha ids com o algoritmo Fisher-Yates.
 void embaralhar_ids(tp_item ids[], int total, int *estado) {
     int i, j;
     tp_item aux;
 
+    // Percorre de tras para frente trocando elementos aleatorios.
     for (i = total - 1; i > 0; i--) {
         j = numero_aleatorio(i + 1, estado);
         aux = ids[i];
@@ -376,6 +412,7 @@ void embaralhar_ids(tp_item ids[], int total, int *estado) {
     }
 }
 
+// Filtra ids de cartas por unidade e dificuldade.
 int coletar_ids_unidade_dificuldade(
     tp_carta banco[],
     int total,
@@ -386,6 +423,7 @@ int coletar_ids_unidade_dificuldade(
     int i;
     int quantidade = 0;
 
+    // Varre o banco e coleta os indices que combinam.
     for (i = 0; i < total; i++) {
         if (banco[i].unidade == unidade && banco[i].dificuldade == dificuldade) {
             ids[quantidade] = i;
@@ -396,6 +434,7 @@ int coletar_ids_unidade_dificuldade(
     return quantidade;
 }
 
+// Recarrega a pilha de uma unidade/dificuldade.
 void recarregar_pilha_unidade(
     tp_pilha *pilha,
     tp_carta banco[],
@@ -408,6 +447,7 @@ void recarregar_pilha_unidade(
     int quantidade;
     int i;
 
+    // Garante pilha vazia antes de recarregar.
     inicializa_pilha(pilha);
 
     quantidade = coletar_ids_unidade_dificuldade(
@@ -418,17 +458,21 @@ void recarregar_pilha_unidade(
         ids
     );
 
+    // Se nao houver perguntas, interrompe.
     if (quantidade == 0) {
         return;
     }
 
+    // Embaralha os ids antes de empilhar.
     embaralhar_ids(ids, quantidade, estado);
 
+    // Empilha todos os ids para sorteio.
     for (i = 0; i < quantidade; i++) {
         push(pilha, ids[i]);
     }
 }
 
+// Carrega pilhas de perguntas para cada unidade/dificuldade.
 void carregar_perguntas(
     tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
     tp_carta banco[],
@@ -438,6 +482,7 @@ void carregar_perguntas(
     int unidade;
     int dificuldade;
 
+    // Prepara pilhas para todas as unidades e dificuldades.
     for (unidade = 1; unidade <= NUM_UNIDADES; unidade++) {
         for (dificuldade = 1; dificuldade <= NUM_DIFICULDADES; dificuldade++) {
             recarregar_pilha_unidade(
@@ -452,6 +497,7 @@ void carregar_perguntas(
     }
 }
 
+// Retira uma carta da pilha, reembaralhando quando necessario.
 int sortear_carta(
     tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
     tp_carta banco[],
@@ -464,6 +510,7 @@ int sortear_carta(
     tp_item id_carta;
     tp_pilha *pilha;
 
+    // Valida unidade e dificuldade informadas.
     if (unidade < 1 || unidade > NUM_UNIDADES) {
         return 0;
     }
@@ -472,8 +519,10 @@ int sortear_carta(
         return 0;
     }
 
+    // Seleciona a pilha correta para sorteio.
     pilha = &pilhas[unidade - 1][dificuldade - 1];
 
+    // Recarrega quando todas as perguntas dessa pilha foram usadas.
     if (pilha_vazia(pilha)) {
         printf(
             "\nPerguntas da unidade %d dificuldade %d esgotadas. Reembaralhando...\n",
@@ -483,6 +532,7 @@ int sortear_carta(
         recarregar_pilha_unidade(pilha, banco, total, unidade, dificuldade, estado);
     }
 
+    // Retira o id da carta do topo.
     if (!pop(pilha, &id_carta)) {
         return 0;
     }
@@ -491,6 +541,7 @@ int sortear_carta(
         return 0;
     }
 
+    // Copia a carta sorteada para retorno.
     *carta_sorteada = banco[id_carta];
     return 1;
 }

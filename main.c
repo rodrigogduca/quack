@@ -1,17 +1,24 @@
+// main.c
+// ---------------------------------------------------------------------------
+// Ponto de entrada do jogo; delega o fluxo principal para o menu.
 #include "menu.h"
 #include "dados.h"
 
+// Executa o loop principal do jogo.
 int main() {
     int opcao_menu;
     int jogo_ativo = 1;
 
-    /* Loop principal do programa: menu inicial e controle de novas partidas. */
+    // Loop principal do programa: menu inicial e controle de novas partidas.
     while (jogo_ativo) {
+        // Mostra o menu principal e captura a opcao.
         opcao_menu = menu_principal();
 
         if (opcao_menu == 1) {
+            // Inicia uma partida; retorno define se volta ao menu.
             jogo_ativo = executar_partida();
         } else {
+            // Encerra o programa.
             exibir_mensagem_saida();
             jogo_ativo = 0;
         }
