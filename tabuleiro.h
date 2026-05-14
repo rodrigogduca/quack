@@ -11,12 +11,12 @@
 #include "config.h"
 
 // Tipos de casas ao longo do tabuleiro.
-typedef enum {
-    CASA_NORMAL = 0,
-    CASA_PERGUNTA,
-    CASA_AVANCO,
-    CASA_RECUO
-} tp_tipo_casa;
+#define CASA_NORMAL 0
+#define CASA_PERGUNTA 1
+#define CASA_AVANCO 2
+#define CASA_RECUO 3
+
+typedef int tp_tipo_casa;
 
 typedef struct tp_casa {
     int numero; // Numero da casa no tabuleiro.
