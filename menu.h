@@ -259,7 +259,7 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_tabuleir
     }
     // Exibe configuracoes basicas do tabuleiro e perguntas.
     printf("\nTabuleiro: %d casas (%d por unidade)\n", tabuleiro->total, CASAS_POR_UNIDADE);
-    printf("Perguntas carregadas: %d (6 por unidade)\n", TOTAL_PERGUNTAS);
+    printf("Perguntas carregadas: %d (unidades 1 e 2)\n", TOTAL_PERGUNTAS);
 }
 
 // Exibe o tabuleiro em formato visual com jogadores e casas especiais.
@@ -411,7 +411,6 @@ int fazer_pergunta(
     tp_carta banco[],
     int total,
     int unidade,
-    int *estado,
     int *acertou
 ) {
     tp_carta carta;
@@ -424,10 +423,10 @@ int fazer_pergunta(
     }
 
     // Sorteia o nivel de dificuldade dentro da unidade atual.
-    dificuldade = sortear_dificuldade(estado);
+    dificuldade = sortear_dificuldade();
     printf("\nDificuldade sorteada: %d\n", dificuldade);
 
-    if (!sortear_carta(pilhas, banco, total, unidade, dificuldade, estado, &carta)) {
+    if (!sortear_carta(pilhas, banco, total, unidade, dificuldade, &carta)) {
         return 0;
     }
 
@@ -495,7 +494,6 @@ int executar_partida() {
     int dado;
     int delta;
     int acertou;
-    int estado = criar_semente_aleatoria();
     tp_casa *casa;
 
     // Entrada e inicializacao da partida.
@@ -511,7 +509,7 @@ int executar_partida() {
     // Inicializa estatisticas e pilhas de perguntas.
     inicializar_estatisticas(&estatisticas, tabuleiro.total);
     montar_banco_cartas(banco);
-    carregar_perguntas(pilhas_perguntas, banco, TOTAL_PERGUNTAS, &estado);
+    carregar_perguntas(pilhas_perguntas, banco, TOTAL_PERGUNTAS);
     exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
     exibir_tabuleiro_visual(&tabuleiro, jogadores, num_jogadores);
 
@@ -534,7 +532,7 @@ int executar_partida() {
         getchar();
 
         // Rolagem do dado e movimento inicial.
-        dado = rolar_dado(&estado);
+        dado = rolar_dado();
         printf("Dado sorteado: %d\n", dado);
 
         jogadores[jogador_atual].posicao = mover_posicao(
@@ -563,7 +561,6 @@ int executar_partida() {
                 banco,
                 TOTAL_PERGUNTAS,
                 casa->unidade,
-                &estado,
                 &acertou
             );
             registrar_resultado(&estatisticas, casa->numero, acertou);

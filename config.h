@@ -18,9 +18,9 @@
 #define CASAS_POR_UNIDADE 10
 #define TOTAL_CASAS (NUM_UNIDADES * CASAS_POR_UNIDADE)
 
-// Perguntas por unidade e total do banco.
-#define PERGUNTAS_POR_UNIDADE 6
-#define TOTAL_PERGUNTAS (NUM_UNIDADES * PERGUNTAS_POR_UNIDADE)
+// Perguntas por unidade (unidades 1 e 2) e total do banco.
+#define PERGUNTAS_POR_UNIDADE 12
+#define TOTAL_PERGUNTAS (2 * PERGUNTAS_POR_UNIDADE)
 
 // Penalidade ao errar e efeitos das casas especiais.
 #define PENALIDADE_ERRO 1

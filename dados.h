@@ -28,54 +28,14 @@ typedef struct {
     int id_player; // Identificador de turno (1..4).
 } tp_player;
 
-// Gera uma semente automatica usando variacoes de endereco em memoria.
-int criar_semente_aleatoria() {
-    int marcador_local = 0;
-    size_t addr = (size_t)&marcador_local;
-    size_t shift = sizeof(size_t) * 4;
-    size_t mix = addr ^ (addr >> shift);
-    int semente = (int)(mix & 0x7fffffff);
-
-    // Evita estado nulo no gerador.
-    if (semente == 0) {
-        semente = 1;
-    }
-
-    return semente;
+// Rola dado virtual (1..6) usando o gerador padrao.
+int rolar_dado() {
+    return (rand() % 6) + 1;
 }
 
-// Gerador linear congruente usando estado externo.
-int numero_aleatorio(int limite, int *estado) {
-    long long proximo;
-
-    // Valida o limite e o ponteiro do estado.
-    if (limite <= 0 || estado == NULL) {
-        return 0;
-    }
-
-    // Atualiza o estado usando parametros classicos do LCG.
-    proximo = ((long long)(*estado) * 1103515245LL) + 12345LL;
-    if (proximo < 0) {
-        proximo = -proximo;
-    }
-
-    // Reduz o estado ao intervalo e retorna modulo do limite.
-    *estado = (int)(proximo % 2147483647LL);
-    return *estado % limite;
-}
-
-// Rola dado virtual (1..6).
-int rolar_dado(int *estado) {
-    // Converte faixa 0..5 para 1..6.
-    int valor = numero_aleatorio(6, estado);
-    return valor + 1;
-}
-
-// Sorteia dificuldade (1..NUM_DIFICULDADES).
-int sortear_dificuldade(int *estado) {
-    // Converte faixa 0..NUM_DIFICULDADES-1 para 1..NUM_DIFICULDADES.
-    int valor = numero_aleatorio(NUM_DIFICULDADES, estado);
-    return valor + 1;
+// Sorteia dificuldade (1..NUM_DIFICULDADES) usando o gerador padrao.
+int sortear_dificuldade() {
+    return (rand() % NUM_DIFICULDADES) + 1;
 }
 
 // Copia texto com limite de tamanho (inclui terminador).
@@ -210,163 +170,223 @@ void montar_banco_cartas(tp_carta cartas[]) {
     );
 
     cartas[2] = criar_carta(
+        "Qual simbolo termina uma instrucao em C?",
+        ";",
+        ",",
+        ":",
+        ".",
+        "?",
+        1, 1, 1, 1, 3
+    );
+
+    cartas[3] = criar_carta(
+        "Qual tipo armazena um caractere unico em C?",
+        "char",
+        "int",
+        "float",
+        "double",
+        "string",
+        1, 1, 1, 1, 4
+    );
+
+    cartas[4] = criar_carta(
         "Qual e o primeiro indice valido de um vetor int v[10]?",
         "1",
         "0",
         "-1",
         "10",
         "Depende do compilador",
-        2, 2, 2, 1, 3
+        2, 2, 2, 1, 5
     );
 
-    cartas[3] = criar_carta(
+    cartas[5] = criar_carta(
         "Qual o resultado da expressao (7 % 3)?",
         "0",
         "1",
         "2",
         "3",
         "7",
-        2, 2, 2, 1, 4
+        2, 2, 2, 1, 6
     );
 
-    cartas[4] = criar_carta(
+    cartas[6] = criar_carta(
+        "Qual operador logico representa 'E' em C?",
+        "&&",
+        "||",
+        "!",
+        "&",
+        "|",
+        1, 2, 2, 1, 7
+    );
+
+    cartas[7] = criar_carta(
+        "Qual funcao le uma linha inteira com espacos do teclado?",
+        "gets",
+        "fgets",
+        "scanf",
+        "printf",
+        "puts",
+        2, 2, 2, 1, 8
+    );
+
+    cartas[8] = criar_carta(
         "O que acontece ao acessar v[10] em int v[10]?",
         "Acessa o ultimo elemento",
         "Acesso fora do limite (erro)",
         "O compilador corrige para v[9]",
         "Retorna sempre 0",
         "O vetor aumenta de tamanho",
-        2, 3, 3, 1, 5
+        2, 3, 3, 1, 9
     );
 
-    cartas[5] = criar_carta(
+    cartas[9] = criar_carta(
         "O que pode ocorrer ao usar printf com variavel nao inicializada?",
         "Erro de compilacao",
         "Valor lixo ou comportamento indefinido",
         "Sempre imprime zero",
         "Sempre imprime -1",
         "O programa termina automaticamente",
-        2, 3, 3, 1, 6
+        2, 3, 3, 1, 10
     );
 
-    cartas[6] = criar_carta(
+    cartas[10] = criar_carta(
+        "Qual o resultado de 5 / 2 usando inteiros?",
+        "2",
+        "2.5",
+        "3",
+        "1",
+        "0",
+        1, 3, 3, 1, 11
+    );
+
+    cartas[11] = criar_carta(
+        "Qual o ultimo indice valido de um vetor int v[10]?",
+        "9",
+        "10",
+        "-1",
+        "1",
+        "Depende do compilador",
+        1, 3, 3, 1, 12
+    );
+
+    cartas[12] = criar_carta(
         "Qual operador acessa campo de struct via ponteiro?",
         ".",
         "->",
         "&",
         "*",
         "::",
-        2, 1, 1, 2, 7
+        2, 1, 1, 2, 13
     );
 
-    cartas[7] = criar_carta(
+    cartas[13] = criar_carta(
         "Qual funcao aloca memoria dinamica em C?",
         "malloc",
         "printf",
         "scanf",
         "sizeof",
         "free",
-        1, 1, 1, 2, 8
+        1, 1, 1, 2, 14
     );
 
-    cartas[8] = criar_carta(
+    cartas[14] = criar_carta(
+        "Qual operador obtem o endereco de uma variavel?",
+        "&",
+        "*",
+        "->",
+        ".",
+        "%",
+        1, 1, 1, 2, 15
+    );
+
+    cartas[15] = criar_carta(
+        "Qual operador dereferencia um ponteiro?",
+        "*",
+        "&",
+        "->",
+        ".",
+        "++",
+        1, 1, 1, 2, 16
+    );
+
+    cartas[16] = criar_carta(
         "Um ponteiro armazena:",
         "Um valor inteiro fixo",
         "Endereco de memoria",
         "Uma string",
         "Um arquivo aberto",
         "Um vetor de chars",
-        2, 2, 2, 2, 9
+        2, 2, 2, 2, 17
     );
 
-    cartas[9] = criar_carta(
+    cartas[17] = criar_carta(
         "Ao passar um ponteiro para funcao, e possivel:",
         "Alterar o conteudo apontado",
         "Somente ler o valor",
         "Alterar o codigo fonte",
         "Mover o ponteiro para NULL automaticamente",
         "Converter para float",
-        1, 2, 2, 2, 10
+        1, 2, 2, 2, 18
     );
 
-    cartas[10] = criar_carta(
+    cartas[18] = criar_carta(
+        "Qual macro representa ponteiro nulo em C?",
+        "NULL",
+        "NIL",
+        "NONE",
+        "ZERO",
+        "VOID",
+        1, 2, 2, 2, 19
+    );
+
+    cartas[19] = criar_carta(
+        "Qual funcao altera o tamanho de um bloco alocado?",
+        "realloc",
+        "malloc",
+        "calloc",
+        "free",
+        "sizeof",
+        1, 2, 2, 2, 20
+    );
+
+    cartas[20] = criar_carta(
         "sizeof(int*) retorna:",
         "Tamanho do int",
         "Tamanho do ponteiro",
         "Sempre 4",
         "Sempre 8",
         "Erro de compilacao",
-        2, 3, 3, 2, 11
+        2, 3, 3, 2, 21
     );
 
-    cartas[11] = criar_carta(
+    cartas[21] = criar_carta(
         "Apos usar malloc, deve-se:",
         "Ignorar o retorno",
         "Verificar NULL e usar free quando nao precisar",
         "Sempre usar scanf",
         "Reiniciar o programa",
         "Declarar outra variavel global",
-        2, 3, 3, 2, 12
+        2, 3, 3, 2, 22
     );
 
-    cartas[12] = criar_carta(
-        "Em uma fila, quem sai primeiro?",
-        "Quem entrou primeiro (FIFO)",
-        "Quem entrou por ultimo (LIFO)",
-        "Quem tem maior valor",
-        "Quem pediu primeiro",
-        "Nao existe ordem",
-        1, 1, 1, 3, 13
+    cartas[22] = criar_carta(
+        "Qual problema ocorre ao esquecer de liberar memoria alocada?",
+        "Vazamento de memoria",
+        "Erro de sintaxe",
+        "Conversao automatica",
+        "Overflow de inteiro",
+        "Mudanca de tipo",
+        1, 3, 3, 2, 23
     );
 
-    cartas[13] = criar_carta(
-        "Em uma pilha, qual operacao remove o topo?",
-        "push",
-        "enqueue",
-        "pop",
-        "peek",
-        "insert",
-        3, 1, 1, 3, 14
-    );
-
-    cartas[14] = criar_carta(
-        "Em uma lista simplesmente encadeada, cada no possui:",
-        "Apenas um indice",
-        "Valor e ponteiro para o proximo",
-        "Somente ponteiro para o anterior",
-        "Dois ponteiros e nenhum valor",
-        "Um vetor fixo de 10 itens",
-        2, 2, 2, 3, 15
-    );
-
-    cartas[15] = criar_carta(
-        "Qual estrutura e mais adequada para controlar turnos em ordem de chegada?",
-        "Fila",
-        "Pilha",
-        "Arvore",
-        "Lista circular sem controle",
-        "Tabela hash",
-        1, 2, 2, 3, 16
-    );
-
-    cartas[16] = criar_carta(
-        "Qual o custo medio de busca em uma arvore de busca balanceada?",
-        "O(1)",
-        "O(log n)",
-        "O(n)",
-        "O(n^2)",
-        "O(n log n)",
-        2, 3, 3, 3, 17
-    );
-
-    cartas[17] = criar_carta(
-        "Em uma pilha, inserir no topo e chamado de:",
-        "pop",
-        "push",
-        "dequeue",
-        "peek",
-        "shift",
-        2, 3, 3, 3, 18
+    cartas[23] = criar_carta(
+        "O que pode acontecer ao dereferenciar um ponteiro NULL?",
+        "Falha de execucao",
+        "Sempre retorna 0",
+        "Cria memoria automaticamente",
+        "Imprime lixo",
+        "Corrige para endereco 1",
+        1, 3, 3, 2, 24
     );
 }
 
@@ -396,13 +416,13 @@ void colocar_jogadores_na_fila(tp_player jogadores[], int quantidade, tp_fila *f
 }
 
 // Embaralha ids com o algoritmo Fisher-Yates.
-void embaralhar_ids(tp_item ids[], int total, int *estado) {
+void embaralhar_ids(tp_item ids[], int total) {
     int i, j;
     tp_item aux;
 
     // Percorre de tras para frente trocando elementos aleatorios.
     for (i = total - 1; i > 0; i--) {
-        j = numero_aleatorio(i + 1, estado);
+        j = rand() % (i + 1);
         aux = ids[i];
         ids[i] = ids[j];
         ids[j] = aux;
@@ -437,8 +457,7 @@ void recarregar_pilha_unidade(
     tp_carta banco[],
     int total,
     int unidade,
-    int dificuldade,
-    int *estado
+    int dificuldade
 ) {
     tp_item ids[TOTAL_PERGUNTAS];
     int quantidade;
@@ -461,7 +480,7 @@ void recarregar_pilha_unidade(
     }
 
     // Embaralha os ids antes de empilhar.
-    embaralhar_ids(ids, quantidade, estado);
+    embaralhar_ids(ids, quantidade);
 
     // Empilha todos os ids para sorteio.
     for (i = 0; i < quantidade; i++) {
@@ -473,8 +492,7 @@ void recarregar_pilha_unidade(
 void carregar_perguntas(
     tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
     tp_carta banco[],
-    int total,
-    int *estado
+    int total
 ) {
     int unidade;
     int dificuldade;
@@ -487,8 +505,7 @@ void carregar_perguntas(
                 banco,
                 total,
                 unidade,
-                dificuldade,
-                estado
+                dificuldade
             );
         }
     }
@@ -501,7 +518,6 @@ int sortear_carta(
     int total,
     int unidade,
     int dificuldade,
-    int *estado,
     tp_carta *carta_sorteada
 ) {
     tp_item id_carta;
@@ -526,7 +542,7 @@ int sortear_carta(
             unidade,
             dificuldade
         );
-        recarregar_pilha_unidade(pilha, banco, total, unidade, dificuldade, estado);
+        recarregar_pilha_unidade(pilha, banco, total, unidade, dificuldade);
     }
 
     // Retira o id da carta do topo.

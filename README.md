@@ -66,7 +66,7 @@ gcc -o quack main.c
 
 ## 🎯 Sistema de Perguntas
 
-- **18 perguntas** (6 por unidade) com 3 niveis de dificuldade
+- **24 perguntas** (12 por unidade nas unidades 1 e 2; unidade 3 ainda sem perguntas) com 3 niveis de dificuldade
 - **Facil**: avanca 1 casa
 - **Media**: avanca 2 casas
 - **Dificil**: avanca 3 casas

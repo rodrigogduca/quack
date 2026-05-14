@@ -1,6 +1,9 @@
 // main.c
 // ---------------------------------------------------------------------------
 // Ponto de entrada do jogo; delega o fluxo principal para o menu.
+#include <stdlib.h>
+#include <time.h>
+
 #include "menu.h"
 #include "dados.h"
 
@@ -8,6 +11,9 @@
 int main() {
     int opcao_menu;
     int jogo_ativo = 1;
+
+    // Inicializa o gerador padrao para evitar sequencias repetidas.
+    srand((unsigned)time(NULL));
 
     // Loop principal do programa: menu inicial e controle de novas partidas.
     while (jogo_ativo) {
