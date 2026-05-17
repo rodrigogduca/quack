@@ -4,7 +4,6 @@
 // tabuleiro.h
 // Estrutura do tabuleiro dinamico e suas operacoes.
 
-#include <stdio.h>
 #include <stdlib.h>
 
 // Tipos de casas ao longo do tabuleiro.

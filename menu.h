@@ -10,7 +10,6 @@
 #include "fila.h"
 #include "dados.h"
 #include "tabuleiro.h"
-#include "estatisticas.h"
 
 // Limpa caracteres pendentes na entrada para evitar leituras indevidas.
 void limpar_entrada() {
@@ -483,7 +482,6 @@ int executar_partida() {
     tp_pilha pilhas_perguntas[3][3];
     tp_carta banco[24];
     tp_tabuleiro tabuleiro;
-    tp_no_est *estatisticas = NULL;
     tp_item id_jogador;
     int num_jogadores, jogador_atual, rodada, pausa;
     int em_jogo = 1;
@@ -504,8 +502,7 @@ int executar_partida() {
         return 1;
     }
 
-    // Inicializa estatisticas e pilhas de perguntas.
-    inicializar_estatisticas(&estatisticas, tabuleiro.total);
+    // Inicializa pilhas de perguntas.
     montar_banco_cartas(banco);
     carregar_perguntas(pilhas_perguntas, banco, 24);
     exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
@@ -538,7 +535,6 @@ int executar_partida() {
             jogadores[jogador_atual].posicao,
             dado
         );
-        registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
         exibir_posicao_atual(&tabuleiro, jogadores, jogador_atual);
 
         // Verifica vitoria apos o movimento do dado.
@@ -557,11 +553,10 @@ int executar_partida() {
             delta = fazer_pergunta(
                 pilhas_perguntas,
                 banco,
-                TOTAL_PERGUNTAS,
+                24,
                 casa->unidade,
                 &acertou
             );
-            registrar_resultado(&estatisticas, casa->numero, acertou);
             if (delta != 0) {
                 // Move novamente com base no resultado da pergunta.
                 jogadores[jogador_atual].posicao = mover_posicao(
@@ -569,7 +564,6 @@ int executar_partida() {
                     jogadores[jogador_atual].posicao,
                     delta
                 );
-                registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
                 if (delta > 0) {
                     exibir_avanco_jogador(jogadores, jogador_atual);
                 } else {
@@ -583,7 +577,6 @@ int executar_partida() {
                 jogadores[jogador_atual].posicao,
                 casa->efeito
             );
-            registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
             exibir_avanco_jogador(jogadores, jogador_atual);
         } else if (casa != NULL && casa->tipo == CASA_RECUO) {
             printf("Casa de penalidade! Retorne %d casa(s).\n", casa->efeito);
@@ -592,7 +585,6 @@ int executar_partida() {
                 jogadores[jogador_atual].posicao,
                 -casa->efeito
             );
-            registrar_visita(&estatisticas, jogadores[jogador_atual].posicao);
             exibir_recuo_jogador(jogadores, jogador_atual);
         }
 
@@ -628,14 +620,6 @@ int executar_partida() {
         }
     }
 
-    // Salva estatisticas e libera recursos.
-    if (salvar_relatorio(estatisticas, "relatorio.txt")) {
-        printf("\nRelatorio salvo em relatorio.txt\n");
-    } else {
-        printf("\nNao foi possivel salvar o relatorio.\n");
-    }
-
-    liberar_estatisticas(estatisticas);
     destruir_tabuleiro(&tabuleiro);
     return retorno_menu;
 }

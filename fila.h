@@ -5,7 +5,6 @@
 // Implementacao de fila circular estatica.
 // Regra da fila: FIFO (First In, First Out).
 
-#include <stdio.h>
 
 // Capacidade maxima da fila (numero de itens).
 #ifndef MAX
@@ -73,26 +72,5 @@ int remove_fila(tp_fila *f, tp_item *e) {
     return 1;
 }
 
-// Retorna a quantidade de elementos da fila (em copia).
-int tamanho_fila(tp_fila f) {
-    int cont = 0;
-    tp_item e;
-    // Remove em copia para contar sem alterar a fila real.
-    while (!fila_vazia(&f)) {
-        remove_fila(&f, &e);
-        cont++;
-    }
-    return cont;
-}
-
-// Imprime copia da fila para depuracao.
-void imprime_fila(tp_fila f) {
-    tp_item e;
-    // Remove em copia para imprimir sem alterar a fila real.
-    while (!fila_vazia(&f)) {
-        remove_fila(&f, &e);
-        printf("\n %d", e);
-    }
-}
 
 #endif

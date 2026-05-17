@@ -5,7 +5,6 @@
 #include <time.h>
 
 #include "menu.h"
-#include "dados.h"
 
 // Executa o loop principal do jogo.
 int main() {
@@ -13,7 +12,7 @@ int main() {
     int jogo_ativo = 1;
 
     // Inicializa o gerador padrao para evitar sequencias repetidas.
-    srand((unsigned)time(NULL));
+    srand((unsigned)time(NULL)); // Inicializa a semente aleatoria com o horario atual.
 
     // Loop principal do programa: menu inicial e controle de novas partidas.
     while (jogo_ativo) {

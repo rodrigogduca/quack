@@ -35,10 +35,8 @@ gcc -o quack main.c
 | `dados.h` | Estruturas de dados, banco de perguntas por unidade e embaralhamento |
 | `menu.h` | Menus do jogo e fluxo completo da partida |
 | `tabuleiro.h` | Tabuleiro dinamico e casas especiais |
-| `estatisticas.h` | Arvore de estatisticas e relatorio em disco |
 | `pilha.h` | Implementacao de Pilha (LIFO) |
 | `fila.h` | Implementacao de Fila (FIFO) |
-| `listase.h` | Implementacao da Lista Simplesmente Encadeada |
 
 ## 🔧 Estruturas de Dados Utilizadas
 
@@ -55,9 +53,6 @@ gcc -o quack main.c
 ### Tabuleiro Dinamico (`tp_tabuleiro`)
 - Lista duplamente encadeada com 30 casas (10 por unidade)
 - Permite navegacao para frente e para tras
-
-### Estatisticas (`tp_no_est`)
-- Arvore binaria de busca para registrar visitas, acertos e erros por casa
 
 ### Estruturas Personalizadas
 - `tp_player`: Dados do jogador (posição, nome, ID)
@@ -84,11 +79,6 @@ gcc -o quack main.c
 2. Pato Donald
 3. Tio Patinhas
 4. Pato
-
-## 📊 Registro de Estatisticas
-
-- Cada casa registra visitas, acertos e erros
-- O relatorio e salvo em `relatorio.txt` ao final da partida
 
 ## 👥 Equipe Quack
 

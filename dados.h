@@ -26,12 +26,12 @@ typedef struct {
     int id_player; // Identificador de turno (1..4).
 } tp_player;
 
-// Rola dado virtual (1..6) usando o gerador padrao.
+// Rola dado virtual (de 1 a 6) usando o gerador padrao.
 int rolar_dado() {
     return (rand() % 6) + 1;
 }
 
-// Sorteia dificuldade (1..3) usando o gerador padrao.
+// Sorteia dificuldade (de 1 a 3) usando o gerador padrao.
 int sortear_dificuldade() {
     return (rand() % 3) + 1;
 }
