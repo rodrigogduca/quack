@@ -1,6 +1,6 @@
 // main.c
-// ---------------------------------------------------------------------------
 // Ponto de entrada do jogo; delega o fluxo principal para o menu.
+
 #include <stdlib.h>
 #include <time.h>
 

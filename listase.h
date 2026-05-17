@@ -2,7 +2,6 @@
 #define LISTASE_H
 
 // listase.h
-// ---------------------------------------------------------------------------
 // Implementacao de lista simplesmente encadeada.
 
 #include <stdio.h>

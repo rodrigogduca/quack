@@ -2,7 +2,6 @@
 #define PILHA_H
 
 // pilha.h
-// ---------------------------------------------------------------------------
 // Implementacao de pilha estatica.
 // Regra da pilha: LIFO (Last In, First Out).
 

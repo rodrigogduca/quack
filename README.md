@@ -32,7 +32,6 @@ gcc -o quack main.c
 | Arquivo | Descrição |
 |---------|-----------|
 | `main.c` | Loop principal do jogo |
-| `config.h` | Constantes do jogo (tabuleiro, perguntas, penalidades) |
 | `dados.h` | Estruturas de dados, banco de perguntas por unidade e embaralhamento |
 | `menu.h` | Menus do jogo e fluxo completo da partida |
 | `tabuleiro.h` | Tabuleiro dinamico e casas especiais |

@@ -2,13 +2,11 @@
 #define MENU_H
 
 // menu.h
-// ---------------------------------------------------------------------------
 // Interface de menus e fluxo principal da partida.
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
 #include "fila.h"
 #include "dados.h"
 #include "tabuleiro.h"
@@ -258,8 +256,8 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_tabuleir
         printf("  - %s (Casa %d)\n", jogadores[i].nome, jogadores[i].posicao);
     }
     // Exibe configuracoes basicas do tabuleiro e perguntas.
-    printf("\nTabuleiro: %d casas (%d por unidade)\n", tabuleiro->total, CASAS_POR_UNIDADE);
-    printf("Perguntas carregadas: %d (unidades 1 e 2)\n", TOTAL_PERGUNTAS);
+    printf("\nTabuleiro: %d casas (%d por unidade)\n", tabuleiro->total, 10);
+    printf("Perguntas carregadas: %d (unidades 1 e 2)\n", 24);
 }
 
 // Exibe o tabuleiro em formato visual com jogadores e casas especiais.
@@ -277,8 +275,8 @@ void exibir_tabuleiro_visual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int
     printf("\nTABULEIRO\n");
     printf("Legenda: P=Pergunta A=Avanco R=Recuo .=Normal | Jogadores 1..4\n");
 
-    for (row_start = 1; row_start <= tabuleiro->total; row_start += CASAS_POR_UNIDADE) {
-        row_end = row_start + CASAS_POR_UNIDADE - 1;
+    for (row_start = 1; row_start <= tabuleiro->total; row_start += 10) {
+        row_end = row_start + 10 - 1;
         if (row_end > tabuleiro->total) {
             row_end = tabuleiro->total;
         }
@@ -386,7 +384,7 @@ void menu_carta_sorteada(tp_carta carta) {
     printf("\n%s\n\n", carta.pergunta);
 
     // Exibe as alternativas numeradas.
-    for (i = 0; i < NUM_ALTERNATIVAS; i++) {
+    for (i = 0; i < 5; i++) {
         printf("%d) %s\n", i + 1, carta.alternativas[i]);
     }
 }
@@ -407,7 +405,7 @@ int menu_resposta_carta() {
 
 // Controla o fluxo visual e retorno da resposta de uma carta.
 int fazer_pergunta(
-    tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
+    tp_pilha pilhas[3][3],
     tp_carta banco[],
     int total,
     int unidade,
@@ -452,9 +450,9 @@ int fazer_pergunta(
         carta.resposta,
         carta.alternativas[carta.resposta - 1]
     );
-    printf("Penalidade: retorna %d casa(s).\n", PENALIDADE_ERRO);
+    printf("Penalidade: retorna %d casa(s).\n", 1);
 
-    return -PENALIDADE_ERRO;
+    return -1;
 }
 
 // Exibe tela de vitoria quando um jogador alcanca a casa final.
@@ -482,8 +480,8 @@ void exibir_posicao_atual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int jo
 int executar_partida() {
     tp_player jogadores[4];
     tp_fila fila_turnos;
-    tp_pilha pilhas_perguntas[NUM_UNIDADES][NUM_DIFICULDADES];
-    tp_carta banco[TOTAL_PERGUNTAS];
+    tp_pilha pilhas_perguntas[3][3];
+    tp_carta banco[24];
     tp_tabuleiro tabuleiro;
     tp_no_est *estatisticas = NULL;
     tp_item id_jogador;
@@ -509,7 +507,7 @@ int executar_partida() {
     // Inicializa estatisticas e pilhas de perguntas.
     inicializar_estatisticas(&estatisticas, tabuleiro.total);
     montar_banco_cartas(banco);
-    carregar_perguntas(pilhas_perguntas, banco, TOTAL_PERGUNTAS);
+    carregar_perguntas(pilhas_perguntas, banco, 24);
     exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
     exibir_tabuleiro_visual(&tabuleiro, jogadores, num_jogadores);
 

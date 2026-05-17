@@ -2,7 +2,6 @@
 #define FILA_H
 
 // fila.h
-// ---------------------------------------------------------------------------
 // Implementacao de fila circular estatica.
 // Regra da fila: FIFO (First In, First Out).
 

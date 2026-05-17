@@ -2,23 +2,21 @@
 #define DADOS_H
 
 // dados.h
-// ---------------------------------------------------------------------------
 // Modelos do jogo, utilitarios e banco de perguntas.
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
 #include "pilha.h"
 #include "fila.h"
 
 typedef struct {
     char pergunta[300]; // Enunciado da pergunta.
-    char alternativas[NUM_ALTERNATIVAS][150]; // Alternativas numeradas.
-    int resposta; // Alternativa correta (1..NUM_ALTERNATIVAS).
+    char alternativas[5][150]; // Alternativas numeradas.
+    int resposta; // Alternativa correta (1..5).
     int avanco; // Casas a avancar se acertar.
-    int dificuldade; // Nivel 1..NUM_DIFICULDADES.
-    int unidade; // Unidade associada (1..NUM_UNIDADES).
+    int dificuldade; // Nivel 1..3.
+    int unidade; // Unidade associada (1..3).
     int id_carta; // Identificador interno da carta.
 } tp_carta;
 
@@ -33,9 +31,9 @@ int rolar_dado() {
     return (rand() % 6) + 1;
 }
 
-// Sorteia dificuldade (1..NUM_DIFICULDADES) usando o gerador padrao.
+// Sorteia dificuldade (1..3) usando o gerador padrao.
 int sortear_dificuldade() {
-    return (rand() % NUM_DIFICULDADES) + 1;
+    return (rand() % 3) + 1;
 }
 
 // Copia texto com limite de tamanho (inclui terminador).
@@ -459,7 +457,7 @@ void recarregar_pilha_unidade(
     int unidade,
     int dificuldade
 ) {
-    tp_item ids[TOTAL_PERGUNTAS];
+    tp_item ids[24];
     int quantidade;
     int i;
 
@@ -490,7 +488,7 @@ void recarregar_pilha_unidade(
 
 // Carrega pilhas de perguntas para cada unidade/dificuldade.
 void carregar_perguntas(
-    tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
+    tp_pilha pilhas[3][3],
     tp_carta banco[],
     int total
 ) {
@@ -498,8 +496,8 @@ void carregar_perguntas(
     int dificuldade;
 
     // Prepara pilhas para todas as unidades e dificuldades.
-    for (unidade = 1; unidade <= NUM_UNIDADES; unidade++) {
-        for (dificuldade = 1; dificuldade <= NUM_DIFICULDADES; dificuldade++) {
+    for (unidade = 1; unidade <= 3; unidade++) {
+        for (dificuldade = 1; dificuldade <= 3; dificuldade++) {
             recarregar_pilha_unidade(
                 &pilhas[unidade - 1][dificuldade - 1],
                 banco,
@@ -513,7 +511,7 @@ void carregar_perguntas(
 
 // Retira uma carta da pilha, reembaralhando quando necessario.
 int sortear_carta(
-    tp_pilha pilhas[NUM_UNIDADES][NUM_DIFICULDADES],
+    tp_pilha pilhas[3][3],
     tp_carta banco[],
     int total,
     int unidade,
@@ -524,11 +522,11 @@ int sortear_carta(
     tp_pilha *pilha;
 
     // Valida unidade e dificuldade informadas.
-    if (unidade < 1 || unidade > NUM_UNIDADES) {
+    if (unidade < 1 || unidade > 3) {
         return 0;
     }
 
-    if (dificuldade < 1 || dificuldade > NUM_DIFICULDADES) {
+    if (dificuldade < 1 || dificuldade > 3) {
         return 0;
     }
 

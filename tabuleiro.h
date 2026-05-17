@@ -2,13 +2,10 @@
 #define TABULEIRO_H
 
 // tabuleiro.h
-// ---------------------------------------------------------------------------
 // Estrutura do tabuleiro dinamico e suas operacoes.
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "config.h"
 
 // Tipos de casas ao longo do tabuleiro.
 #define CASA_NORMAL 0
@@ -47,8 +44,8 @@ int unidade_por_posicao(int pos) {
     if (pos <= 0) {
         return 1;
     }
-    // Divide em blocos de CASAS_POR_UNIDADE.
-    return ((pos - 1) / CASAS_POR_UNIDADE) + 1;
+    // Divide em blocos de 10 casas.
+    return ((pos - 1) / 10) + 1;
 }
 
 // Define o tipo de casa de acordo com a posicao.
@@ -61,7 +58,7 @@ tp_tipo_casa tipo_casa_por_posicao(int pos) {
     }
 
     // Offset dentro da unidade para decidir o tipo.
-    offset = ((pos - 1) % CASAS_POR_UNIDADE) + 1;
+    offset = ((pos - 1) % 10) + 1;
 
     if (offset == 2 || offset == 5 || offset == 8) {
         return CASA_PERGUNTA;
@@ -82,10 +79,10 @@ tp_tipo_casa tipo_casa_por_posicao(int pos) {
 int efeito_casa(tp_tipo_casa tipo) {
     // Retorna valores predefinidos para bonus/penalidade.
     if (tipo == CASA_AVANCO) {
-        return AVANCO_CASA_ESPECIAL;
+        return 2;
     }
     if (tipo == CASA_RECUO) {
-        return RECUO_CASA_ESPECIAL;
+        return 2;
     }
     return 0;
 }
@@ -120,7 +117,7 @@ int adicionar_casa(tp_tabuleiro *tab, int numero) {
 // Libera toda memoria do tabuleiro.
 void destruir_tabuleiro(tp_tabuleiro *tab);
 
-// Cria o tabuleiro completo com TOTAL_CASAS.
+// Cria o tabuleiro completo com 30 casas.
 int criar_tabuleiro(tp_tabuleiro *tab) {
     int i;
 
@@ -128,7 +125,7 @@ int criar_tabuleiro(tp_tabuleiro *tab) {
     inicializar_tabuleiro(tab);
 
     // Cria todas as casas em ordem.
-    for (i = 1; i <= TOTAL_CASAS; i++) {
+    for (i = 1; i <= 30; i++) {
         if (!adicionar_casa(tab, i)) {
             // Em caso de falha, libera recursos parciais.
             destruir_tabuleiro(tab);

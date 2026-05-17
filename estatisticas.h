@@ -2,7 +2,6 @@
 #define ESTATISTICAS_H
 
 // estatisticas.h
-// ---------------------------------------------------------------------------
 // Arvore de estatisticas para visitas, acertos e erros por casa.
 
 #include <stdio.h>
