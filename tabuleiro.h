@@ -7,10 +7,6 @@
 #include <stdlib.h>
 
 // Tipos de casas ao longo do tabuleiro.
-#define CASA_NORMAL 0
-#define CASA_PERGUNTA 1
-#define CASA_AVANCO 2
-#define CASA_RECUO 3
 
 typedef int tp_tipo_casa;
 
@@ -49,38 +45,38 @@ int unidade_por_posicao(int pos) {
 
 // Define o tipo de casa de acordo com a posicao.
 tp_tipo_casa tipo_casa_por_posicao(int pos) {
-    int offset;
+    int deslocamento;
 
     // Posicoes invalidas sao tratadas como normais.
     if (pos <= 0) {
-        return CASA_NORMAL;
+        return 0;
     }
 
-    // Offset dentro da unidade para decidir o tipo.
-    offset = ((pos - 1) % 10) + 1;
+    // Deslocamento dentro da unidade para decidir o tipo.
+    deslocamento = ((pos - 1) % 10) + 1;
 
-    if (offset == 2 || offset == 5 || offset == 8) {
-        return CASA_PERGUNTA;
+    if (deslocamento == 2 || deslocamento == 5 || deslocamento == 8) {
+        return 1;
     }
 
-    if (offset == 3) {
-        return CASA_AVANCO;
+    if (deslocamento == 3) {
+        return 2;
     }
 
-    if (offset == 7) {
-        return CASA_RECUO;
+    if (deslocamento == 7) {
+        return 3;
     }
 
-    return CASA_NORMAL;
+    return 0;
 }
 
 // Retorna o efeito numerico de uma casa especial.
 int efeito_casa(tp_tipo_casa tipo) {
     // Retorna valores predefinidos para bonus/penalidade.
-    if (tipo == CASA_AVANCO) {
+    if (tipo == 2) {
         return 2;
     }
-    if (tipo == CASA_RECUO) {
+    if (tipo == 3) {
         return 2;
     }
     return 0;

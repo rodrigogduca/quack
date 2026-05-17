@@ -54,6 +54,43 @@ void copiar_texto(char destino[], int tamanho, char origem[]) {
     destino[i] = '\0';
 }
 
+// Anexa (concatena) um texto ao final de outro, respeitando o limite do buffer.
+void anexar_texto(char destino[], int tamanho, char origem[]) {
+    int i = 0;
+    int j = 0;
+
+    // Encontra o fim atual do destino.
+    while (i < tamanho && destino[i] != '\0') {
+        i++;
+    }
+
+    // Se nao houver espaco para adicionar nada (inclusive terminador), sai.
+    if (i >= tamanho - 1) {
+        if (tamanho > 0) destino[tamanho - 1] = '\0';
+        return;
+    }
+
+    // Se origem vazia, nao acrescenta espaco.
+    if (origem[0] == '\0') {
+        return;
+    }
+
+    // Adiciona um espaco separador caso haja texto previo e espaco disponivel.
+    if (i > 0 && i < tamanho - 1) {
+        destino[i] = ' ';
+        i++;
+    }
+
+    // Copia a origem respeitando o limite.
+    while (i < tamanho - 1 && origem[j] != '\0') {
+        destino[i] = origem[j];
+        i++;
+        j++;
+    }
+
+    destino[i] = '\0';
+}
+
 // Converte inteiro positivo para string.
 void inteiro_para_texto(int valor, char texto[]) {
     char invertido[12];
@@ -414,26 +451,46 @@ void colocar_jogadores_na_fila(tp_player jogadores[], int quantidade, tp_fila *f
 }
 
 // Embaralha ids com o algoritmo Fisher-Yates.
-void embaralhar_ids(tp_item ids[], int total) {
+// 
+// Algoritmo Fisher-Yates (também conhecido como Knuth Shuffle):
+// 1. Começa do último elemento do array (índice total-1).
+// 2. Para cada posição i, seleciona aleatoriamente um índice j entre 0 e i.
+// 3. Troca o elemento na posição i com o elemento na posição j.
+// 4. Avança para a posição anterior (i-1) e repete até o início.
+// 5. Resultado: permutação aleatória com distribuição uniforme.
+//
+// Exemplo com [0, 1, 2, 3]:
+// - i=3: j=rand()%4, troca ids[3] com ids[j]
+// - i=2: j=rand()%3, troca ids[2] com ids[j]
+// - i=1: j=rand()%2, troca ids[1] com ids[j]
+// - i=0: fim (um elemento já está garantido)
+void embaralhar_ids(tp_item indice_cartas[], int total) {
     int i, j;
     tp_item aux;
 
-    // Percorre de tras para frente trocando elementos aleatorios.
+    // Itera do último índice até o segundo (total-1 até 1).
+    // Não precisa processar o índice 0 pois só resta um elemento.
     for (i = total - 1; i > 0; i--) {
+        // Escolhe aleatoriamente um índice j entre 0 e i (inclusive).
+        // rand() % (i + 1) gera um número no intervalo [0, i].
         j = rand() % (i + 1);
-        aux = ids[i];
-        ids[i] = ids[j];
-        ids[j] = aux;
+        
+        // Troca o elemento na posição i com o elemento na posição j.
+        // Usa variável auxiliar para não perder dados.
+        aux = indice_cartas[i];
+        indice_cartas[i] = indice_cartas[j];
+        indice_cartas[j] = aux;
     }
 }
 
 // Filtra ids de cartas por unidade e dificuldade.
+// Filtra índices de cartas por unidade e dificuldade.
 int coletar_ids_unidade_dificuldade(
     tp_carta banco[],
     int total,
     int unidade,
     int dificuldade,
-    tp_item ids[]
+    tp_item indice_cartas[]
 ) {
     int i;
     int quantidade = 0;
@@ -441,7 +498,7 @@ int coletar_ids_unidade_dificuldade(
     // Varre o banco e coleta os indices que combinam.
     for (i = 0; i < total; i++) {
         if (banco[i].unidade == unidade && banco[i].dificuldade == dificuldade) {
-            ids[quantidade] = i;
+            indice_cartas[quantidade] = i;
             quantidade++;
         }
     }
@@ -457,7 +514,7 @@ void recarregar_pilha_unidade(
     int unidade,
     int dificuldade
 ) {
-    tp_item ids[24];
+    tp_item indice_cartas[24];
     int quantidade;
     int i;
 
@@ -469,7 +526,7 @@ void recarregar_pilha_unidade(
         total,
         unidade,
         dificuldade,
-        ids
+        indice_cartas
     );
 
     // Se nao houver perguntas, interrompe.
@@ -477,12 +534,12 @@ void recarregar_pilha_unidade(
         return;
     }
 
-    // Embaralha os ids antes de empilhar.
-    embaralhar_ids(ids, quantidade);
+    // Embaralha os índices antes de empilhar.
+    embaralhar_ids(indice_cartas, quantidade);
 
-    // Empilha todos os ids para sorteio.
+    // Empilha todos os índices para sorteio.
     for (i = 0; i < quantidade; i++) {
-        push(pilha, ids[i]);
+        push(pilha, indice_cartas[i]);
     }
 }
 
