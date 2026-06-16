@@ -428,10 +428,6 @@ void montar_banco_cartas(tp_carta cartas[]) {
         "Qual é a propriedade fundamental que define uma Árvore Binária de Busca (BST)?",
         "Todos os nós da árvore devem possuir exatamente dois nós filhos.",
         "Os nós da subárvore esquerda possuem valores menores que o nó pai, e os nós da subárvore direita possuem valores maiores.",
-        "O caminho da raiz até qualquer folha deve ter exatamente o mesmo comprimento.",cartas[24] = criar_carta(
-        "Qual é a propriedade fundamental que define uma Árvore Binária de Busca (BST)?",
-        "Todos os nós da árvore devem possuir exatamente dois nós filhos.",
-        "Os nós da subárvore esquerda possuem valores menores que o nó pai, e os nós da subárvore direita possuem valores maiores.",
         "O caminho da raiz até qualquer folha deve ter exatamente o mesmo comprimento.",
         "Os nós da subárvore esquerda são maiores que o nó raiz, e os da direita são menores.",
         "A árvore deve estar perfeitamente balanceada em todos os seus níveis.",
