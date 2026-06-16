@@ -427,7 +427,6 @@ void montar_banco_cartas(tp_carta cartas[]) {
     );
 
     cartas[24] = criar_carta(
-<<<<<<< HEAD
         "O que pode acontecer ao dereferenciar um ponteiro NULL?",
         "Falha de execucao",
         "Sempre retorna 0",
@@ -438,116 +437,6 @@ void montar_banco_cartas(tp_carta cartas[]) {
     );
 
     cartas[25] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 25
-    );
-    
-    cartas[26] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 26
-    );
-
-    cartas[27] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 27
-    );
-
-    cartas[28] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 28
-    );
-
-    cartas[29] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 29
-    );
-
-    cartas[30] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 30
-    );
-
-    cartas[31] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 31
-    );
-    
-    cartas[32] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 32
-    );
-
-    cartas[33] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 33
-    );
-
-    cartas[34] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 34
-    );
-
-    cartas[35] = criar_carta(
-        "PERGUNTA TERCEIRA UNIDADE",
-        "ALTERNATIVA 1",
-        "ALTERNATIVA 2",
-        "ALTERNATIVA 3",
-        "ALTERNATIVA 4",
-        "ALTERNATIVA 5",
-        1, 3, 3, 3, 35
-    );
-   
-=======
         "Qual é a propriedade fundamental que define uma Árvore Binária de Busca (BST)?",
         "Todos os nós da árvore devem possuir exatamente dois nós filhos.",
         "Os nós da subárvore esquerda possuem valores menores que o nó pai, e os nós da subárvore direita possuem valores maiores.",
@@ -636,7 +525,6 @@ void montar_banco_cartas(tp_carta cartas[]) {
         "Os nós de uma Trie armazenam obrigatoriamente chaves inteiras completas em cada nível para garantir o ordenamento numérico.",
         4, 3, 3, 3, 33
     );
->>>>>>> e7a8c54ae90d399fd9a91881c15c7a2d854fbf1e
 }
 
 // Inicializa posicao, nome e id de cada jogador.
