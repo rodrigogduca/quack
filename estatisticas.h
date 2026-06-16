@@ -125,6 +125,44 @@ void salvar_relatorio_interno(tp_no_est *raiz, FILE *arquivo) {
     salvar_relatorio_interno(raiz->dir, arquivo);
 }
 
+// Salva uma resposta individual no historico CSV baseado no PDF de orientacao.
+void salvar_historico_resposta(
+    char turma[],
+    char nome_jogador[],
+    int id_carta,
+    int unidade,
+    int dificuldade,
+    int resposta_jogador,
+    int resposta_correta,
+    int acertou
+) {
+    FILE *arquivo = fopen("historico_respostas.csv", "a");
+    long tamanho;
+
+    if (arquivo == NULL) return;
+
+    // Verifica tamanho para inserir cabecalho se estiver vazio.
+    fseek(arquivo, 0, SEEK_END);
+    tamanho = ftell(arquivo);
+    if (tamanho == 0) {
+        fprintf(arquivo, "turma;id_jogador;id_pergunta;unidade;tema;subtema;dificuldade;resposta_jogador;resposta_correta;resultado\n");
+    }
+
+    // Mapeia os numeros para as descricoes legiveis pedidas no PDF
+    char *dif_str = "Facil";
+    if (dificuldade == 2) dif_str = "Medio";
+    else if (dificuldade == 3) dif_str = "Dificil";
+
+    char *res_str = acertou ? "Acertou" : "Errou";
+    char resp_jog = (resposta_jogador >= 1 && resposta_jogador <= 5) ? (char)('A' + resposta_jogador - 1) : '-';
+    char resp_cor = (char)('A' + resposta_correta - 1);
+
+    fprintf(arquivo, "%s;%s;P%03d;%d;Geral;Geral;%s;%c;%c;%s\n",
+            turma, nome_jogador, id_carta, unidade, dif_str, resp_jog, resp_cor, res_str);
+
+    fclose(arquivo);
+}
+
 // Salva o relatorio completo em arquivo texto.
 int salvar_relatorio(tp_no_est *raiz, char caminho[]) {
     // Abre o arquivo e grava o cabecalho do relatorio.

@@ -10,6 +10,7 @@
 #include "fila.h"
 #include "dados.h"
 #include "tabuleiro.h"
+#include "estatisticas.h"
 
 // Limpa caracteres pendentes na entrada para evitar leituras indevidas.
 void limpar_entrada() {
@@ -22,6 +23,30 @@ void limpar_entrada() {
 // Limpa o terminal para exibir apenas o menu atual.
 void limpar_tela() {
     system("cls");
+}
+
+// Lê e exibe o conteudo do historico de respostas (CSV).
+void exibir_estatisticas_menu() {
+    FILE *arquivo = fopen("historico_respostas.csv", "r");
+    char linha[512];
+
+    limpar_tela();
+    printf("\n================================================================================\n");
+    printf("                        HISTORICO DE RESPOSTAS (CSV)                              \n");
+    printf("================================================================================\n");
+
+    if (arquivo == NULL) {
+        printf("\nNenhum historico encontrado ainda. Jogue uma partida primeiro!\n");
+    } else {
+        // Imprime cada linha do arquivo formatado.
+        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+            printf("%s", linha);
+        }
+        fclose(arquivo);
+    }
+    printf("================================================================================\n");
+    printf("Pressione ENTER para voltar ao menu...");
+    getchar();
 }
 
 // Exibe o menu principal e retorna a opcao escolhida pelo usuario.
@@ -41,16 +66,22 @@ int menu_principal() {
         printf("============================================\n");
         printf("1. Novo jogo\n");
         printf("2. Sair\n");
+        printf("3. Ver Historico de Respostas\n");
         printf("============================================\n");
-        printf("Digite a opcao (1 ou 2): ");
+        printf("Digite a opcao (1, 2 ou 3): ");
         leitura = scanf("%d", &opcao);
         limpar_entrada();
 
-        if (leitura == 1 && (opcao == 1 || opcao == 2)) {
-            break;
+        if (leitura == 1) {
+            if (opcao == 1 || opcao == 2) {
+                break;
+            } else if (opcao == 3) {
+                exibir_estatisticas_menu();
+                continue; // Volta pro topo do laco pra manter o menu aberto
+            }
         }
 
-        printf("Opcao invalida! Digite 1 ou 2.\n");
+        printf("Opcao invalida! Digite 1, 2 ou 3.\n");
         printf("Pressione ENTER para tentar novamente...");
         getchar();
     }
@@ -258,7 +289,7 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_tabuleir
     }
     // Exibe configuracoes basicas do tabuleiro e perguntas.
     printf("\nTabuleiro: %d casas (%d por unidade)\n", tabuleiro->total, 10);
-    printf("Perguntas carregadas: %d (unidades 1 e 2)\n", 24);
+    printf("Perguntas carregadas: %d (unidades 1, 2 e 3)\n", TOTAL_CARTAS);
 }
 
 // Exibe o tabuleiro em formato visual com jogadores e casas especiais.
@@ -407,10 +438,11 @@ int menu_resposta_carta() {
 // Controla o fluxo visual e retorno da resposta de uma carta.
 int fazer_pergunta(
     tp_pilha pilhas[3][3],
-    tp_carta banco[],
+    tp_carta banco[36],
     int total,
     int unidade,
-    int *acertou
+    int *acertou,
+    char nome_jogador[]
 ) {
     tp_carta carta;
     int resposta;
@@ -435,8 +467,12 @@ int fazer_pergunta(
 
     printf("\nRESPOSTA...\n");
 
+    // Salva o historico da resposta (formato CSV do PDF)
+    int is_correct = (resposta == carta.resposta);
+    salvar_historico_resposta("AED-2024.1", nome_jogador, carta.id_carta, carta.unidade, carta.dificuldade, resposta, carta.resposta, is_correct);
+
     // Avalia a resposta e calcula a movimentacao.
-    if (resposta == carta.resposta) {
+    if (is_correct) {
         if (acertou != NULL) {
             *acertou = 1;
         }
@@ -482,9 +518,10 @@ int executar_partida() {
     tp_player jogadores[4];
     tp_fila fila_turnos;
     tp_pilha pilhas_perguntas[3][3];
-    tp_carta banco[24];
+    tp_carta banco[36];
     tp_tabuleiro tabuleiro;
     tp_item id_jogador;
+    tp_no_est *estatisticas = NULL;
     int num_jogadores, jogador_atual, rodada, pausa;
     int em_jogo = 1;
     int retorno_menu = 1;
@@ -504,9 +541,12 @@ int executar_partida() {
         return 1;
     }
 
+    // Inicia a arvore para rastrear visitas e respostas em cada casa
+    inicializar_estatisticas(&estatisticas, tabuleiro.total);
+
     // Inicializa pilhas de perguntas.
     montar_banco_cartas(banco);
-    carregar_perguntas(pilhas_perguntas, banco, 24);
+    carregar_perguntas(pilhas_perguntas, banco, 36);
     exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
     exibir_tabuleiro_visual(&tabuleiro, jogadores, num_jogadores);
 
@@ -549,6 +589,11 @@ int executar_partida() {
         // Resolve a casa atual (pergunta, bonus ou penalidade).
         casa = obter_casa(&tabuleiro, jogadores[jogador_atual].posicao);
 
+        // Registra a visita na casa atual
+        if (casa != NULL) {
+            registrar_visita(&estatisticas, casa->numero);
+        }
+
         // Resolve o efeito da casa atual.
         if (casa != NULL && casa->tipo == 1) {
             acertou = 0;
@@ -556,10 +601,14 @@ int executar_partida() {
             delta = fazer_pergunta(
                 pilhas_perguntas,
                 banco,
-                24,
+                TOTAL_CARTAS,
                 casa->unidade,
-                &acertou
+                &acertou,
+                jogadores[jogador_atual].nome
             );
+
+            // Registra estatistica se acertou ou errou na casa de pergunta
+            registrar_resultado(&estatisticas, casa->numero, acertou);
 
             if (delta != 0) {
                 // Move novamente com base no resultado da pergunta.
@@ -623,6 +672,11 @@ int executar_partida() {
             retorno_menu = 0;
         }
     }
+
+    // Salva o relatorio completo e libera a memoria alocada para a arvore
+    printf("\nSalvando estatisticas da partida em 'relatorio_estatisticas.txt'...\n");
+    salvar_relatorio(estatisticas, "relatorio_estatisticas.txt");
+    liberar_estatisticas(estatisticas);
 
     destruir_tabuleiro(&tabuleiro);
     return retorno_menu;

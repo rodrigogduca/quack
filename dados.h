@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TOTAL_CARTAS 36
+
 #include "pilha.h"
 #include "fila.h"
 
@@ -421,8 +423,129 @@ void montar_banco_cartas(tp_carta cartas[]) {
         "Cria memoria automaticamente",
         "Imprime lixo",
         "Corrige para endereco 1",
-        1, 3, 3, 2, 24
+        1, 3, 3, 2, 23
     );
+
+    cartas[24] = criar_carta(
+        "O que pode acontecer ao dereferenciar um ponteiro NULL?",
+        "Falha de execucao",
+        "Sempre retorna 0",
+        "Cria memoria automaticamente",
+        "Imprime lixo",
+        "Corrige para endereco 1",
+        1, 3, 3, 3, 24
+    );
+
+    cartas[25] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 25
+    );
+    
+    cartas[26] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 26
+    );
+
+    cartas[27] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 27
+    );
+
+    cartas[28] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 28
+    );
+
+    cartas[29] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 29
+    );
+
+    cartas[30] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 30
+    );
+
+    cartas[31] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 31
+    );
+    
+    cartas[32] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 32
+    );
+
+    cartas[33] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 33
+    );
+
+    cartas[34] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 34
+    );
+
+    cartas[35] = criar_carta(
+        "PERGUNTA TERCEIRA UNIDADE",
+        "ALTERNATIVA 1",
+        "ALTERNATIVA 2",
+        "ALTERNATIVA 3",
+        "ALTERNATIVA 4",
+        "ALTERNATIVA 5",
+        1, 3, 3, 3, 35
+    );
+   
 }
 
 // Inicializa posicao, nome e id de cada jogador.
@@ -486,7 +609,7 @@ void embaralhar_ids(tp_item indice_cartas[], int total) {
 // Filtra ids de cartas por unidade e dificuldade.
 // Filtra índices de cartas por unidade e dificuldade.
 int coletar_ids_unidade_dificuldade(
-    tp_carta banco[],
+    tp_carta banco[36],
     int total,
     int unidade,
     int dificuldade,
@@ -509,12 +632,12 @@ int coletar_ids_unidade_dificuldade(
 // Recarrega a pilha de uma unidade/dificuldade.
 void recarregar_pilha_unidade(
     tp_pilha *pilha,
-    tp_carta banco[],
+    tp_carta banco[36],
     int total,
     int unidade,
     int dificuldade
 ) {
-    tp_item indice_cartas[24];
+    tp_item indice_cartas[TOTAL_CARTAS];
     int quantidade;
     int i;
 
@@ -546,7 +669,7 @@ void recarregar_pilha_unidade(
 // Carrega pilhas de perguntas para cada unidade/dificuldade.
 void carregar_perguntas(
     tp_pilha pilhas[3][3],
-    tp_carta banco[],
+    tp_carta banco[36],
     int total
 ) {
     int unidade;
@@ -569,7 +692,7 @@ void carregar_perguntas(
 // Retira uma carta da pilha, reembaralhando quando necessario.
 int sortear_carta(
     tp_pilha pilhas[3][3],
-    tp_carta banco[],
+    tp_carta banco[36],
     int total,
     int unidade,
     int dificuldade,
