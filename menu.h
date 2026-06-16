@@ -289,7 +289,7 @@ void exibir_inicio_partida(tp_player jogadores[], int num_jogadores, tp_tabuleir
     }
     // Exibe configuracoes basicas do tabuleiro e perguntas.
     printf("\nTabuleiro: %d casas (%d por unidade)\n", tabuleiro->total, 10);
-    printf("Perguntas carregadas: %d (unidades 1, 2 e 3)\n", TOTAL_CARTAS);
+    printf("Perguntas carregadas: %d (unidades 1, 2 e 3)\n", 36);
 }
 
 // Exibe o tabuleiro em formato visual com jogadores e casas especiais.
@@ -468,11 +468,22 @@ int fazer_pergunta(
     printf("\nRESPOSTA...\n");
 
     // Salva o historico da resposta (formato CSV do PDF)
-    int is_correct = (resposta == carta.resposta);
-    salvar_historico_resposta("AED-2024.1", nome_jogador, carta.id_carta, carta.unidade, carta.dificuldade, resposta, carta.resposta, is_correct);
+    int resposta_correta = (resposta == carta.resposta);
+    salvar_historico_resposta(
+        "AED-2026.1", 
+        nome_jogador, 
+        carta.id_carta, 
+        carta.unidade, 
+        carta.tema, 
+        carta.subtema, 
+        carta.dificuldade, 
+        resposta, 
+        carta.resposta, 
+        resposta_correta
+    );
 
     // Avalia a resposta e calcula a movimentacao.
-    if (is_correct) {
+    if (resposta_correta) {
         if (acertou != NULL) {
             *acertou = 1;
         }
@@ -521,7 +532,6 @@ int executar_partida() {
     tp_carta banco[36];
     tp_tabuleiro tabuleiro;
     tp_item id_jogador;
-    tp_no_est *estatisticas = NULL;
     int num_jogadores, jogador_atual, rodada, pausa;
     int em_jogo = 1;
     int retorno_menu = 1;
@@ -541,11 +551,9 @@ int executar_partida() {
         return 1;
     }
 
-    // Inicia a arvore para rastrear visitas e respostas em cada casa
-    inicializar_estatisticas(&estatisticas, tabuleiro.total);
-
     // Inicializa pilhas de perguntas.
     montar_banco_cartas(banco);
+    exportar_perguntas_csv(banco, 36); // Salva as perguntas em csv
     carregar_perguntas(pilhas_perguntas, banco, 36);
     exibir_inicio_partida(jogadores, num_jogadores, &tabuleiro);
     exibir_tabuleiro_visual(&tabuleiro, jogadores, num_jogadores);
@@ -589,11 +597,6 @@ int executar_partida() {
         // Resolve a casa atual (pergunta, bonus ou penalidade).
         casa = obter_casa(&tabuleiro, jogadores[jogador_atual].posicao);
 
-        // Registra a visita na casa atual
-        if (casa != NULL) {
-            registrar_visita(&estatisticas, casa->numero);
-        }
-
         // Resolve o efeito da casa atual.
         if (casa != NULL && casa->tipo == 1) {
             acertou = 0;
@@ -601,14 +604,11 @@ int executar_partida() {
             delta = fazer_pergunta(
                 pilhas_perguntas,
                 banco,
-                TOTAL_CARTAS,
+                36,
                 casa->unidade,
                 &acertou,
                 jogadores[jogador_atual].nome
             );
-
-            // Registra estatistica se acertou ou errou na casa de pergunta
-            registrar_resultado(&estatisticas, casa->numero, acertou);
 
             if (delta != 0) {
                 // Move novamente com base no resultado da pergunta.
@@ -673,10 +673,6 @@ int executar_partida() {
         }
     }
 
-    // Salva o relatorio completo e libera a memoria alocada para a arvore
-    printf("\nSalvando estatisticas da partida em 'relatorio_estatisticas.txt'...\n");
-    salvar_relatorio(estatisticas, "relatorio_estatisticas.txt");
-    liberar_estatisticas(estatisticas);
 
     destruir_tabuleiro(&tabuleiro);
     return retorno_menu;
