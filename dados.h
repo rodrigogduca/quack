@@ -423,6 +423,100 @@ void montar_banco_cartas(tp_carta cartas[]) {
         "Corrige para endereco 1",
         1, 3, 3, 2, 24
     );
+
+    cartas[24] = criar_carta(
+        "Qual é a propriedade fundamental que define uma Árvore Binária de Busca (BST)?",
+        "Todos os nós da árvore devem possuir exatamente dois nós filhos.",
+        "Os nós da subárvore esquerda possuem valores menores que o nó pai, e os nós da subárvore direita possuem valores maiores.",
+        "O caminho da raiz até qualquer folha deve ter exatamente o mesmo comprimento.",cartas[24] = criar_carta(
+        "Qual é a propriedade fundamental que define uma Árvore Binária de Busca (BST)?",
+        "Todos os nós da árvore devem possuir exatamente dois nós filhos.",
+        "Os nós da subárvore esquerda possuem valores menores que o nó pai, e os nós da subárvore direita possuem valores maiores.",
+        "O caminho da raiz até qualquer folha deve ter exatamente o mesmo comprimento.",
+        "Os nós da subárvore esquerda são maiores que o nó raiz, e os da direita são menores.",
+        "A árvore deve estar perfeitamente balanceada em todos os seus níveis.",
+        2, 1, 1, 3, 25
+    );
+    
+    cartas[25] = criar_carta(
+        "Qual é o principal objetivo de se utilizar uma Árvore AVL em vez de uma Árvore Binária de Busca (BST) convencional?",
+        "Permitir o armazenamento de dados diretamente em arquivos de texto sequenciais.",
+        "Eliminar completamente a necessidade de ponteiros ou referências na implementação.",
+        "Garantir que as operações de busca, inserção e remoção mantenham complexidade de tempo no pior caso de O(log n) por meio do balanceamento automático.",
+        "Permitir que cada nó tenha mais de dois filhos para economizar memória RAM.",
+        "Facilitar exclusivamente a ordenação lexicográfica de cadeias de caracteres.",
+        3, 1, 1, 3, 26
+    );
+
+    cartas[26] = criar_carta(
+        "Na manipulação de arquivos em linguagem C (utilizando a biblioteca stdio.h), qual é a função do ponteiro do tipo FILE*?",
+        "Alocar memória RAM dinamicamente para os novos nós de uma árvore.",
+        "Controlar o fluxo de execução síncrona e concorrência do algoritmo.",
+        "Armazenar o conteúdo completo do arquivo diretamente na memória cache do processador.",
+        "Servir como uma referência/canal para abrir, ler, escrever ou navegar dentro de um arquivo específico no disco.",
+        "Criptografar automaticamente os dados antes de salvá-los no sistema de arquivos.",
+        4, 1, 1, 3, 27
+    );
+
+    cartas[27] = criar_carta(
+        "A estrutura de dados conhecida como Árvore Digital (Trie) é amplamente utilizada para aplicações específicas. Qual é o cenário de uso mais adequado para uma Trie?",
+        "Armazenamento de registros numéricos de ponto flutuante com alta precisão.",
+        "Balanceamento estrito de chaves inteiras dispersas em sistemas de paginação.",
+        "Sistemas de busca por prefixos, mecanismos de autocompletar texto (autocomplete) e dicionários de strings.",
+        "Gerenciamento de blocos de memória secundária em sistemas de arquivos magnéticos.",
+        "Ordenação de vetores numéricos de tamanho fixo de forma estável.",
+        3, 2, 2, 3, 28
+    );
+
+    cartas[28] = criar_carta(
+        "Considere uma Árvore Binária de Busca (BST) inicialmente vazia. Se inserirmos as chaves na seguinte sequência exacta: [10, 5, 15, 3, 7], qual será o resultado do percurso em-ordem (in-order) dessa árvore?",
+        "[3, 5, 7, 10, 15]",
+        "[10, 5, 3, 7, 15]",
+        "[3, 7, 5, 15, 10]",
+        "[15, 10, 7, 5, 3]",
+        "[10, 15, 5, 7, 3]",
+        1, 2, 2, 3, 29
+    );
+
+    cartas[29] = criar_carta(
+        "Durante a inserção de um elemento em uma Árvore AVL, o balanceamento de um nó foi violado após uma inserção na subárvore direita do filho direito desse nó (caso Direita-Direita). Qual operação de rotação deve ser executada para corrigir o fator de balanceamento?",
+        "Rotação Dupla Direita (ou Esquerda-Direita).",
+        "Rotação Simples à Direita.",
+        "Rotação Dupla Esquerda (ou Direita-Esquerda).",
+        "Rotação Simples à Esquerda.",
+        "Nenhuma rotação, apenas a atualização dos fatores de carga.",
+        4, 2, 2, 3, 30
+    );
+
+    cartas[30] = criar_carta(
+        "No contexto de persistência de dados, qual é a principal vantagem de se implementar índices baseados em estruturas de árvores (em disco) em vez de realizar buscas sequenciais diretamente no arquivo de dados?",
+        "Redução drástica do número de acessos à memória secundária (disco), que é ordens de grandeza mais lenta que a memória RAM.",
+        "Eliminação completa do uso de buffers de entrada e saída (I/O) no sistema operacional.",
+        "Garantia de que o arquivo final indexado ocupe menos espaço físico no disco rígido que o original.",
+        "Permissão para que múltiplos processos escrevam no mesmo byte simultaneamente sem travas de concorrência.",
+        "Transformação em tempo de execução de arquivos binários em arquivos de texto legíveis.",
+        1, 3, 3, 3, 31
+    );
+
+    cartas[31] = criar_carta(
+        "Considere uma Árvore AVL onde um nó X possui fator de balanceamento igual a -2 (calculado como altura(esquerda) - altura(direita)). Sabe-se que o filho à direita de X possui fator de balanceamento igual a +1. Para rebalancear a árvore a partir do nó X, qual sequência de rotações deve ser efetuada?",
+        "Uma única rotação simples à direita no nó X.",
+        "Uma rotação simples à esquerda no filho de X, seguida por uma rotação simples à direita no nó X.",
+        "Uma rotação simples à direita no filho de X, seguida por uma rotação simples à esquerda no nó X (Rotação Dupla Esquerda).",
+        "Duas rotações simples consecutivas à esquerda diretamente no nó X.",
+        "Uma rotação dupla à direita diretamente no filho de X.",
+        3, 3, 3, 3, 32
+    );
+
+    cartas[32] = criar_carta(
+        "Em relação à eficiência de espaço e tempo de uma Árvore Trie padrão (conforme a representação em arquivos de cabeçalho como ArvTrie.h), qual das alternativas descreve corretamente uma characteristic complexa dessa estrutura?",
+        "O tempo de busca de uma chave de comprimento L depende diretamente do número total de chaves (N) armazenadas na árvore, ou seja, O(N * L).",
+        "A remoção de uma palavra em uma Trie exige obrigatoriamente a reconstrução completa de toda a árvore a partir do nó raiz.",
+        "Ela consome menos memória do que uma árvore binária para chaves numéricas inteiras aleatórias e altamente esparsas.",
+        "O pior caso de espaço de uma Trie padrão pode ser muito alto devido ao desperdício de ponteiros nulos em nós que não compartilham prefixos, onde cada nó aloca internamente um array correspondente ao tamanho do alfabeto utilizado.",
+        "Os nós de uma Trie armazenam obrigatoriamente chaves inteiras completas em cada nível para garantir o ordenamento numérico.",
+        4, 3, 3, 3, 33
+    );
 }
 
 // Inicializa posicao, nome e id de cada jogador.
