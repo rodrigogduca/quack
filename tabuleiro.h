@@ -10,15 +10,17 @@
 
 typedef int tp_tipo_casa;
 
+// Representa uma celula individual do tabuleiro.
 typedef struct tp_casa {
     int numero; // Numero da casa no tabuleiro.
     int unidade; // Unidade correspondente a posicao.
     tp_tipo_casa tipo; // Tipo logico da casa.
     int efeito; // Avanco/recuo das casas especiais.
-    struct tp_casa *prox; // Proxima casa.
-    struct tp_casa *ant; // Casa anterior.
+    struct tp_casa *proxima_casa; // Ponteiro para a proxima casa do trajeto.
+    struct tp_casa *casa_anterior; // Ponteiro para a casa anterior do trajeto.
 } tp_casa;
 
+// Estrutura principal que gerencia o fluxo de casas do jogo (Lista Duplamente Encadeada).
 typedef struct {
     tp_casa *inicio; // Primeira casa.
     tp_casa *fim; // Ultima casa.
@@ -26,34 +28,34 @@ typedef struct {
 } tp_tabuleiro;
 
 // Inicializa estrutura do tabuleiro.
-void inicializar_tabuleiro(tp_tabuleiro *tab) {
+void inicializar_tabuleiro(tp_tabuleiro *tabuleiro_referencia) {
     // Inicializa ponteiros e contador.
-    tab->inicio = NULL;
-    tab->fim = NULL;
-    tab->total = 0;
+    tabuleiro_referencia->inicio = NULL;
+    tabuleiro_referencia->fim = NULL;
+    tabuleiro_referencia->total = 0;
 }
 
 // Calcula a unidade correspondente a posicao.
-int unidade_por_posicao(int pos) {
+int unidade_por_posicao(int posicao_alvo) {
     // Garante unidade minima para posicoes invalidas.
-    if (pos <= 0) {
+    if (posicao_alvo <= 0) {
         return 1;
     }
     // Divide em blocos de 10 casas.
-    return ((pos - 1) / 10) + 1;
+    return ((posicao_alvo - 1) / 10) + 1;
 }
 
 // Define o tipo de casa de acordo com a posicao.
-tp_tipo_casa tipo_casa_por_posicao(int pos) {
+tp_tipo_casa tipo_casa_por_posicao(int posicao_alvo) {
     int deslocamento;
 
     // Posicoes invalidas sao tratadas como normais.
-    if (pos <= 0) {
+    if (posicao_alvo <= 0) {
         return 0;
     }
 
     // Deslocamento dentro da unidade para decidir o tipo.
-    deslocamento = ((pos - 1) % 10) + 1;
+    deslocamento = ((posicao_alvo - 1) % 10) + 1;
 
     if (deslocamento == 2 || deslocamento == 5 || deslocamento == 8) {
         return 1;
@@ -83,7 +85,7 @@ int efeito_casa(tp_tipo_casa tipo) {
 }
 
 // Cria e encadeia uma nova casa no fim do tabuleiro.
-int adicionar_casa(tp_tabuleiro *tab, int numero) {
+int adicionar_casa(tp_tabuleiro *tabuleiro_referencia, int numero) {
     // Aloca a nova casa.
     tp_casa *nova = (tp_casa *)malloc(sizeof(tp_casa));
     if (nova == NULL) {
@@ -94,36 +96,36 @@ int adicionar_casa(tp_tabuleiro *tab, int numero) {
     nova->unidade = unidade_por_posicao(numero);
     nova->tipo = tipo_casa_por_posicao(numero);
     nova->efeito = efeito_casa(nova->tipo);
-    nova->prox = NULL;
-    nova->ant = tab->fim;
+    nova->proxima_casa = NULL;
+    nova->casa_anterior = tabuleiro_referencia->fim;
 
     // Encadeia no fim da lista.
-    if (tab->fim != NULL) {
-        tab->fim->prox = nova;
+    if (tabuleiro_referencia->fim != NULL) {
+        tabuleiro_referencia->fim->proxima_casa = nova;
     } else {
-        tab->inicio = nova;
+        tabuleiro_referencia->inicio = nova;
     }
 
-    tab->fim = nova;
-    tab->total++;
+    tabuleiro_referencia->fim = nova;
+    tabuleiro_referencia->total++;
     return 1;
 }
 
 // Libera toda memoria do tabuleiro.
-void destruir_tabuleiro(tp_tabuleiro *tab);
+void destruir_tabuleiro(tp_tabuleiro *tabuleiro_referencia);
 
 // Cria o tabuleiro completo com 30 casas.
-int criar_tabuleiro(tp_tabuleiro *tab) {
+int criar_tabuleiro(tp_tabuleiro *tabuleiro_referencia) {
     int i;
 
     // Comeca com estrutura vazia.
-    inicializar_tabuleiro(tab);
+    inicializar_tabuleiro(tabuleiro_referencia);
 
     // Cria todas as casas em ordem.
     for (i = 1; i <= 30; i++) {
-        if (!adicionar_casa(tab, i)) {
+        if (!adicionar_casa(tabuleiro_referencia, i)) {
             // Em caso de falha, libera recursos parciais.
-            destruir_tabuleiro(tab);
+            destruir_tabuleiro(tabuleiro_referencia);
             return 0;
         }
     }
@@ -132,66 +134,68 @@ int criar_tabuleiro(tp_tabuleiro *tab) {
 }
 
 // Libera as casas e reinicializa o tabuleiro.
-void destruir_tabuleiro(tp_tabuleiro *tab) {
-    tp_casa *atual = tab->inicio;
-    tp_casa *prox;
+void destruir_tabuleiro(tp_tabuleiro *tabuleiro_referencia) {
+    tp_casa *atual = tabuleiro_referencia->inicio;
+    tp_casa *proxima_temporaria;
 
     // Libera casa por casa.
     while (atual != NULL) {
-        prox = atual->prox;
+        proxima_temporaria = atual->proxima_casa;
         free(atual);
-        atual = prox;
+        atual = proxima_temporaria;
     }
 
     // Reinicializa ponteiros.
-    inicializar_tabuleiro(tab);
+    inicializar_tabuleiro(tabuleiro_referencia);
 }
 
 // Busca ponteiro da casa pela posicao.
-tp_casa *obter_casa(tp_tabuleiro *tab, int pos) {
+tp_casa *obter_casa(tp_tabuleiro *tabuleiro_referencia, int posicao_alvo) {
     tp_casa *atual;
     int i;
 
     // Valida faixa e ponteiro.
-    if (tab == NULL || pos < 1 || pos > tab->total) {
+    if (tabuleiro_referencia == NULL || posicao_alvo < 1 || posicao_alvo > tabuleiro_referencia->total) {
         return NULL;
     }
 
     // Percorre a lista ate a posicao solicitada.
-    atual = tab->inicio;
-    for (i = 1; i < pos && atual != NULL; i++) {
-        atual = atual->prox;
+    atual = tabuleiro_referencia->inicio;
+    for (i = 1; i < posicao_alvo && atual != NULL; i++) {
+        atual = atual->proxima_casa;
     }
 
     return atual;
 }
 
 // Move para frente/tras respeitando os limites do tabuleiro.
-int mover_posicao(tp_tabuleiro *tab, int pos_atual, int passos) {
+int mover_posicao(tp_tabuleiro *tabuleiro_referencia, int posicao_atual, int passos) {
     tp_casa *casa;
     int restante;
 
     // Caso o tabuleiro esteja vazio, retorna a posicao atual.
-    if (tab == NULL || tab->inicio == NULL) {
-        return pos_atual;
+    if (tabuleiro_referencia == NULL || tabuleiro_referencia->inicio == NULL) {
+        return posicao_atual;
     }
 
     // Busca a casa atual.
-    casa = obter_casa(tab, pos_atual);
+    casa = obter_casa(tabuleiro_referencia, posicao_atual);
     if (casa == NULL) {
-        return pos_atual;
+        return posicao_atual;
     }
 
     // Move passo a passo respeitando os limites.
     restante = passos;
 
-    while (restante > 0 && casa->prox != NULL) {
-        casa = casa->prox;
+    // Avanca pelo tabuleiro.
+    while (restante > 0 && casa->proxima_casa != NULL) {
+        casa = casa->proxima_casa;
         restante--;
     }
 
-    while (restante < 0 && casa->ant != NULL) {
-        casa = casa->ant;
+    // Recua pelo tabuleiro.
+    while (restante < 0 && casa->casa_anterior != NULL) {
+        casa = casa->casa_anterior;
         restante++;
     }
 

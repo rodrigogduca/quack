@@ -23,10 +23,13 @@ typedef struct {
     char subtema[50]; // Subtema da pergunta
 } tp_carta;
 
+// Estrutura de dados que representa cada jogador no jogo.
 typedef struct {
     int posicao; // Casa atual no tabuleiro.
     char nome[50]; // Nome exibido no jogo.
     int id_player; // Identificador de turno (1..4).
+    int historico_casas[100]; // Armazena o historico das casas percorridas para o ranking final.
+    int total_casas_visitadas; // Contador total de casas armazenadas no historico.
 } tp_player;
 
 // Rola dado virtual (de 1 a 6) usando o gerador padrao.
@@ -153,40 +156,40 @@ void montar_nome_jogador(char nome_saida[], int tamanho, int indice) {
 
 // Cria uma carta e copia seus textos.
 tp_carta criar_carta(
-    char perg[],
-    char alt1[],
-    char alt2[],
-    char alt3[],
-    char alt4[],
-    char alt5[],
-    int resp,
-    int avanc,
-    int dif,
-    int unidade,
-    int id,
-    char tema[],
-    char subtema[]
+    char texto_pergunta[],
+    char alternativa_1[],
+    char alternativa_2[],
+    char alternativa_3[],
+    char alternativa_4[],
+    char alternativa_5[],
+    int resposta_correta,
+    int avanco_casas,
+    int nivel_dificuldade,
+    int unidade_referencia,
+    int identificador_carta,
+    char tema_texto[],
+    char subtema_texto[]
 ) {
-    tp_carta c;
+    tp_carta nova_carta;
 
-    // Copia enunciado e alternativas para o struct.
-    copiar_texto(c.pergunta, sizeof(c.pergunta), perg);
-    copiar_texto(c.alternativas[0], sizeof(c.alternativas[0]), alt1);
-    copiar_texto(c.alternativas[1], sizeof(c.alternativas[1]), alt2);
-    copiar_texto(c.alternativas[2], sizeof(c.alternativas[2]), alt3);
-    copiar_texto(c.alternativas[3], sizeof(c.alternativas[3]), alt4);
-    copiar_texto(c.alternativas[4], sizeof(c.alternativas[4]), alt5);
+    // Copia os textos do enunciado e das alternativas de forma segura para o struct da carta.
+    copiar_texto(nova_carta.pergunta, sizeof(nova_carta.pergunta), texto_pergunta);
+    copiar_texto(nova_carta.alternativas[0], sizeof(nova_carta.alternativas[0]), alternativa_1);
+    copiar_texto(nova_carta.alternativas[1], sizeof(nova_carta.alternativas[1]), alternativa_2);
+    copiar_texto(nova_carta.alternativas[2], sizeof(nova_carta.alternativas[2]), alternativa_3);
+    copiar_texto(nova_carta.alternativas[3], sizeof(nova_carta.alternativas[3]), alternativa_4);
+    copiar_texto(nova_carta.alternativas[4], sizeof(nova_carta.alternativas[4]), alternativa_5);
 
-    // Preenche metadados da carta.
-    c.resposta = resp;
-    c.avanco = avanc;
-    c.dificuldade = dif;
-    c.unidade = unidade;
-    c.id_carta = id;
-    copiar_texto(c.tema, sizeof(c.tema), tema);
-    copiar_texto(c.subtema, sizeof(c.subtema), subtema);
+    // Preenche os metadados numericos e textuais da carta.
+    nova_carta.resposta = resposta_correta;
+    nova_carta.avanco = avanco_casas;
+    nova_carta.dificuldade = nivel_dificuldade;
+    nova_carta.unidade = unidade_referencia;
+    nova_carta.id_carta = identificador_carta;
+    copiar_texto(nova_carta.tema, sizeof(nova_carta.tema), tema_texto);
+    copiar_texto(nova_carta.subtema, sizeof(nova_carta.subtema), subtema_texto);
 
-    return c;
+    return nova_carta;
 }
 
 // Preenche o banco fixo de perguntas.
@@ -547,11 +550,22 @@ void inicializar_jogadores(tp_player jogadores[], int quantidade) {
         jogadores[i].posicao = 1;
         montar_nome_jogador(jogadores[i].nome, sizeof(jogadores[i].nome), i + 1);
         jogadores[i].id_player = i + 1;
+        jogadores[i].historico_casas[0] = 1; // Registra que ele comeca na casa 1.
+        jogadores[i].total_casas_visitadas = 1; // Contador inicia em 1 devido a casa inicial.
+    }
+}
+
+// Registra a passagem do jogador por uma casa no seu historico.
+void registrar_historico_posicao(tp_player *jogador, int posicao) {
+    // Previne estouro do buffer de historico (maximo de 100 casas)
+    if (jogador->total_casas_visitadas < 100) {
+        jogador->historico_casas[jogador->total_casas_visitadas] = posicao;
+        jogador->total_casas_visitadas++;
     }
 }
 
 // Preenche a fila de turnos respeitando a ordem de entrada.
-void colocar_jogadores_na_fila(tp_player jogadores[], int quantidade, tp_fila *fila_turnos) {
+void colocar_jogadores_na_fila(tp_player jogadores[4], int quantidade, tp_fila *fila_turnos) {
     int i;
 
     // Fila vazia antes de inserir a ordem dos jogadores.
@@ -577,22 +591,21 @@ void colocar_jogadores_na_fila(tp_player jogadores[], int quantidade, tp_fila *f
 // - i=2: j=rand()%3, troca ids[2] com ids[j]
 // - i=1: j=rand()%2, troca ids[1] com ids[j]
 // - i=0: fim (um elemento já está garantido)
-void embaralhar_ids(tp_item indice_cartas[], int total) {
-    int i, j;
-    tp_item aux;
+void embaralhar_ids(tp_item indice_cartas[], int total_elementos) {
+    int indice_atual, indice_aleatorio;
+    tp_item valor_auxiliar;
 
     // Itera do último índice até o segundo (total-1 até 1).
     // Não precisa processar o índice 0 pois só resta um elemento.
-    for (i = total - 1; i > 0; i--) {
-        // Escolhe aleatoriamente um índice j entre 0 e i (inclusive).
-        // rand() % (i + 1) gera um número no intervalo [0, i].
-        j = rand() % (i + 1);
+    for (indice_atual = total_elementos - 1; indice_atual > 0; indice_atual--) {
+        // Escolhe aleatoriamente um índice entre 0 e o indice atual (inclusive).
+        indice_aleatorio = rand() % (indice_atual + 1);
         
-        // Troca o elemento na posição i com o elemento na posição j.
-        // Usa variável auxiliar para não perder dados.
-        aux = indice_cartas[i];
-        indice_cartas[i] = indice_cartas[j];
-        indice_cartas[j] = aux;
+        // Troca o elemento na posição atual com o elemento na posição aleatoria.
+        // Usa variável auxiliar para nao perder os dados na memoria.
+        valor_auxiliar = indice_cartas[indice_atual];
+        indice_cartas[indice_atual] = indice_cartas[indice_aleatorio];
+        indice_cartas[indice_aleatorio] = valor_auxiliar;
     }
 }
 
