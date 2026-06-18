@@ -12,6 +12,16 @@
 #include "tabuleiro.h"
 #include "estatisticas.h"
 
+// Cores ANSI para a interface de terminal
+#define RESET   "\033[0m"  // Reseta todas as formatacoes (cor e estilo) para o padrao do terminal.
+#define BOLD    "\033[1m"  // Aplica negrito/brilho ao texto.
+#define RED     "\033[31m" // Altera a cor do texto para vermelho.
+#define GREEN   "\033[32m" // Altera a cor do texto para verde.
+#define YELLOW  "\033[33m" // Altera a cor do texto para amarelo.
+#define BLUE    "\033[34m" // Altera a cor do texto para azul.
+#define MAGENTA "\033[35m" // Altera a cor do texto para magenta/roxo.
+#define CYAN    "\033[36m" // Altera a cor do texto para ciano/azul claro.
+
 // Limpa caracteres pendentes na entrada para evitar leituras indevidas.
 void limpar_entrada() {
     int c;
@@ -56,14 +66,14 @@ int menu_principal() {
 
     while (1) {
         limpar_tela();
-        printf("\n============================================\n");
+        printf(CYAN BOLD "\n============================================\n");
         printf("            QUACK BOARDGAME                \n");
-        printf("============================================\n");
-        printf("              __                            \n");
-        printf("           __(o )>  QUACK!                  \n");
+        printf("============================================\n" RESET);
+        printf(YELLOW "              __                            \n");
+        printf("           __(o )>  " CYAN "QUACK!" YELLOW "                  \n");
         printf("           \\ <_. )                         \n");
-        printf("            `---'                           \n");
-        printf("============================================\n");
+        printf("            `---'                           \n" RESET);
+        printf(CYAN BOLD "============================================\n" RESET);
         printf("1. Novo jogo\n");
         printf("2. Ver Historico de Respostas\n");
         printf("0. Sair\n");
@@ -331,22 +341,22 @@ void exibir_tabuleiro_visual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int
         // Linha 2: tipo de casa (P=pergunta, A=avanco, R=recuo, .=normal).
         printf("|%s|", "TIPO");
         for (casa_num = inicio_linha; casa_num <= fim_linha; casa_num++) {
-            char tipo = '.';
-
             casa = obter_casa(tabuleiro, casa_num);
             if (casa != NULL) {
                 if (casa->tipo == 1) {
-                    tipo = 'P';
+                    printf("  " YELLOW "P" RESET "  |");
                 } else if (casa->tipo == 2) {
-                    tipo = 'A';
+                    printf("  " GREEN "A" RESET "  |");
                 } else if (casa->tipo == 3) {
-                    tipo = 'R';
+                    printf("  " RED "R" RESET "  |");
+                } else {
+                    printf("  .  |");
                 }
+            } else {
+                printf("  .  |");
             }
-
-            printf("  %c  |", tipo);
         }
-        printf("|\n");
+        printf("\n");
 
         // Linha 3: jogadores presentes em cada casa.
         printf("|%s|", "JOGS");
@@ -379,12 +389,12 @@ void exibir_turno_jogador(tp_player jogadores[], int indice_jogador, int numero_
     // Limpa o terminal para destacar o turno atual.
     limpar_tela();
     // Cabecalho visual da rodada.
-    printf("\n========================================\n");
+    printf(BLUE BOLD "\n========================================\n");
     printf("           RODADA %d                     \n", numero_rodada);
-    printf("========================================\n");
-    printf("Vez de: %s\n", jogadores[indice_jogador].nome);
+    printf("========================================\n" RESET);
+    printf("Vez de: " CYAN BOLD "%s\n" RESET, jogadores[indice_jogador].nome);
     printf("Posicao atual: Casa %d\n", jogadores[indice_jogador].posicao);
-    printf("----------------------------------------\n");
+    printf(BLUE "----------------------------------------\n" RESET);
 }
 
 // Exibe mensagem de avanco apos resposta correta.
@@ -489,12 +499,12 @@ int fazer_pergunta(
         if (indicador_acerto != NULL) {
             *indicador_acerto = 1;
         }
-        printf("\n*** CORRETA! ***\n");
+        printf(GREEN BOLD "\n*** CORRETA! ***\n" RESET);
         printf("Voce avanca %d casa(s)!\n", carta.avanco);
         return carta.avanco;
     }
 
-    printf("\n*** ERRADA! ***\n");
+    printf(RED BOLD "\n*** ERRADA! ***\n" RESET);
     printf(
         "A resposta correta era: %d) %s\n",
         carta.resposta,
@@ -510,12 +520,12 @@ void exibir_vencedor(tp_player jogadores[], int numero_jogadores, int indice_jog
     int i, j;
     tp_player copia_jogadores[4];
 
-    printf("\n========================================\n");
+    printf(YELLOW BOLD "\n========================================\n");
     printf("        VENCEDOR!!!                      \n");
     printf("========================================\n");
     printf("%s VENCEU O JOGO!\n", jogadores[indice_jogador].nome);
     printf("========================================\n");
-    printf("========================================\n\n");
+    printf("========================================\n\n" RESET);
 
     // Cria uma copia para ordenar sem alterar o array original.
     for (i = 0; i < numero_jogadores; i++) {
