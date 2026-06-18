@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "menu.h" 
+#include "menu.h"
 
 // Executa o loop principal do jogo.
 int main() {
