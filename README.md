@@ -88,7 +88,7 @@ E então inicie o jogo:
 
 ## 🎯 Sistema de Perguntas
 
-- **24 perguntas** (12 por unidade nas unidades 1 e 2; unidade 3 ainda sem perguntas) com 3 niveis de dificuldade
+- **36 perguntas** (12 por unidade, distribuidas em 3 niveis de dificuldade) com banco preenchido em vetor de cartas
 - **Facil**: avanca 1 casa
 - **Media**: avanca 2 casas
 - **Dificil**: avanca 3 casas

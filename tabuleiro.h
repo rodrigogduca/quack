@@ -41,7 +41,7 @@ int unidade_por_posicao(int posicao_alvo) {
     if (posicao_alvo <= 0) {
         return 1;
     }
-    // Divide em blocos de 10 casas.
+    // Divide em blocos de 10 casas por unidade.
     return ((posicao_alvo - 1) / 10) + 1;
 }
 

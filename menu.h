@@ -35,18 +35,51 @@ void limpar_tela() {
     system("cls");
 }
 
+// Desenha uma linha horizontal usada nos blocos da interface.
+void interface_linha(char caractere, int tamanho) {
+    int i;
+
+    for (i = 0; i < tamanho; i++) {
+        printf("%c", caractere);
+    }
+    printf("\n");
+}
+
+// Exibe um cabecalho padronizado para as telas principais.
+void interface_cabecalho(char titulo[]) {
+    printf(CYAN BOLD "\n");
+    interface_linha('=', 58);
+    printf("| %-54s |\n", titulo);
+    interface_linha('=', 58);
+    printf(RESET);
+}
+
+// Exibe uma opcao de menu no mesmo formato em todas as telas.
+void interface_opcao(int numero, char texto[]) {
+    printf("  [%d] %s\n", numero, texto);
+}
+
+// Exibe uma mensagem de aviso/erro com destaque visual.
+void interface_aviso(char mensagem[]) {
+    printf(YELLOW BOLD "\n%s\n" RESET, mensagem);
+}
+
+// Exibe uma pausa padronizada antes de voltar para outro menu.
+void interface_aguardar_enter(char mensagem[]) {
+    printf("\n%s", mensagem);
+    getchar();
+}
+
 // Lê e exibe o conteudo do historico de respostas (CSV).
 void exibir_estatisticas_menu() {
     FILE *arquivo = fopen("historico_respostas.csv", "r");
     char linha[512];
 
     limpar_tela();
-    printf("\n================================================================================\n");
-    printf("                        HISTORICO DE RESPOSTAS (CSV)                              \n");
-    printf("================================================================================\n");
+    interface_cabecalho("HISTORICO DE RESPOSTAS (CSV)");
 
     if (arquivo == NULL) {
-        printf("\nNenhum historico encontrado ainda. Jogue uma partida primeiro!\n");
+        interface_aviso("Nenhum historico encontrado ainda. Jogue uma partida primeiro!");
     } else {
         // Imprime cada linha do arquivo formatado.
         while (fgets(linha, sizeof(linha), arquivo) != NULL) {
@@ -54,9 +87,8 @@ void exibir_estatisticas_menu() {
         }
         fclose(arquivo);
     }
-    printf("================================================================================\n");
-    printf("Pressione ENTER para voltar ao menu...");
-    getchar();
+    interface_linha('=', 58);
+    interface_aguardar_enter("Pressione ENTER para voltar ao menu...");
 }
 
 // Exibe o menu principal e retorna a opcao escolhida pelo usuario.
@@ -66,18 +98,16 @@ int menu_principal() {
 
     while (1) {
         limpar_tela();
-        printf(CYAN BOLD "\n============================================\n");
-        printf("            QUACK BOARDGAME                \n");
-        printf("============================================\n" RESET);
+        interface_cabecalho("QUACK BOARDGAME");
         printf(YELLOW "              __                            \n");
         printf("           __(o )>  " CYAN "QUACK!" YELLOW "                  \n");
         printf("           \\ <_. )                         \n");
-        printf("            `---'                           \n" RESET);
-        printf(CYAN BOLD "============================================\n" RESET);
-        printf("1. Novo jogo\n");
-        printf("2. Ver Historico de Respostas\n");
-        printf("0. Sair\n");
-        printf("============================================\n");
+            printf("            `---'                           \n" RESET);
+        interface_linha('-', 58);
+        interface_opcao(1, "Novo jogo");
+        interface_opcao(2, "Ver historico de respostas");
+        printf("  [0] Sair\n");
+        interface_linha('-', 58);
         printf("Digite a opcao (1, 2 ou 0): ");
         leitura = scanf("%d", &opcao);
         limpar_entrada();
@@ -91,9 +121,8 @@ int menu_principal() {
             }
         }
 
-        printf("Opcao invalida! Digite 1, 2 ou 0.\n");
-        printf("Pressione ENTER para tentar novamente...");
-        getchar();
+        interface_aviso("Opcao invalida! Digite 1, 2 ou 0.");
+        interface_aguardar_enter("Pressione ENTER para tentar novamente...");
     }
 
     return opcao;
@@ -101,7 +130,8 @@ int menu_principal() {
 
 // Exibe a mensagem de encerramento do jogo.
 void exibir_mensagem_saida() {
-    printf("\nAte mais! Obrigado por jogar QUACK QUIZ!\n");
+    interface_cabecalho("FIM DE JOGO");
+    printf("Ate mais! Obrigado por jogar QUACK QUIZ!\n");
 }
 
 // Define o numero de jogadores da partida atual.
@@ -112,9 +142,7 @@ int menu_num_jogadores() {
     // Repete ate receber um numero valido.
     while (1) {
         limpar_tela();
-        printf("\n================================\n");
-        printf("      NUMERO DE JOGADORES       \n");
-        printf("================================\n");
+        interface_cabecalho("NUMERO DE JOGADORES");
         printf("Escolha entre 2 e 4 jogadores: ");
         leitura = scanf("%d", &quantidade);
         limpar_entrada();
@@ -123,9 +151,8 @@ int menu_num_jogadores() {
             break;
         }
 
-        printf("Opcao invalida! Digite um numero entre 2 e 4.\n");
-        printf("Pressione ENTER para tentar novamente...");
-        getchar();
+        interface_aviso("Opcao invalida! Digite um numero entre 2 e 4.");
+        interface_aguardar_enter("Pressione ENTER para tentar novamente...");
     }
 
     return quantidade;
@@ -148,30 +175,29 @@ int personagem_ja_escolhido(int personagem, int personagens_escolhidos[], int to
 int menu_personagem(int jogador_num, int personagens_escolhidos[], int total_escolhidos) {
     int personagem;
     int leitura;
+    int i;
+    char nomes_personagens[4][50] = {
+        "Patolino",
+        "Pato Donald",
+        "Tio Patinhas",
+        "Pato"
+    };
 
     // Mantem o menu ate o jogador escolher uma opcao valida.
     while (1) {
         limpar_tela();
-        printf("\n================================\n");
-        printf("  JOGADOR %d - SELECIONANDO PERSONAGEM\n", jogador_num);
-        printf("================================\n");
-        printf(
-            "1. Patolino%s\n",
-            personagem_ja_escolhido(1, personagens_escolhidos, total_escolhidos) ? " (indisponivel)" : ""
-        );
-        printf(
-            "2. Pato Donald%s\n",
-            personagem_ja_escolhido(2, personagens_escolhidos, total_escolhidos) ? " (indisponivel)" : ""
-        );
-        printf(
-            "3. Tio Patinhas%s\n",
-            personagem_ja_escolhido(3, personagens_escolhidos, total_escolhidos) ? " (indisponivel)" : ""
-        );
-        printf(
-            "4. Pato%s\n",
-            personagem_ja_escolhido(4, personagens_escolhidos, total_escolhidos) ? " (indisponivel)" : ""
-        );
-        printf("--------------------------------\n");
+        interface_cabecalho("SELECAO DE PERSONAGEM");
+        printf("Jogador %d, escolha seu personagem:\n\n", jogador_num);
+        // Exibe os personagens a partir do vetor de nomes padrao.
+        for (i = 1; i <= 4; i++) {
+            printf(
+                "  [%d] %-14s%s\n",
+                i,
+                nomes_personagens[i - 1],
+                personagem_ja_escolhido(i, personagens_escolhidos, total_escolhidos) ? " (indisponivel)" : ""
+            );
+        }
+        interface_linha('-', 58);
         printf("Digite sua opcao: ");
         leitura = scanf("%d", &personagem);
         limpar_entrada();
@@ -182,12 +208,11 @@ int menu_personagem(int jogador_num, int personagens_escolhidos[], int total_esc
         }
 
         if (leitura == 1 && personagem >= 1 && personagem <= 4) {
-            printf("Personagem indisponivel! Escolha outro.\n");
+            interface_aviso("Personagem indisponivel! Escolha outro.");
         } else {
-            printf("Resposta invalida! Digite um numero entre 1 e 4.\n");
+            interface_aviso("Resposta invalida! Digite um numero entre 1 e 4.");
         }
-        printf("Pressione ENTER para tentar novamente...");
-        getchar();
+        interface_aguardar_enter("Pressione ENTER para tentar novamente...");
     }
 
     return personagem;
@@ -195,12 +220,17 @@ int menu_personagem(int jogador_num, int personagens_escolhidos[], int total_esc
 
 // Converte o id do personagem para o nome exibido no jogo.
 void nome_personagem(int id, char nome_saida[]) {
-    switch(id) {
-        case 1: copiar_texto(nome_saida, 50, "Patolino"); break;
-        case 2: copiar_texto(nome_saida, 50, "Pato Donald"); break;
-        case 3: copiar_texto(nome_saida, 50, "Tio Patinhas"); break;
-        case 4: copiar_texto(nome_saida, 50, "Pato"); break;
-        default: copiar_texto(nome_saida, 50, "Desconhecido"); break;
+    char nomes_personagens[4][50] = {
+        "Patolino",
+        "Pato Donald",
+        "Tio Patinhas",
+        "Pato"
+    };
+
+    if (id >= 1 && id <= 4) {
+        copiar_texto(nome_saida, 50, nomes_personagens[id - 1]);
+    } else {
+        copiar_texto(nome_saida, 50, "Desconhecido");
     }
 }
 
@@ -209,13 +239,11 @@ int menu_pause() {
     int opcao;
 
     limpar_tela();
-    printf("\n================================\n");
-    printf("              PAUSE              \n");
-    printf("================================\n");
-    printf("1. Continuar\n");
-    printf("2. Sair para o menu principal\n");
-    printf("3. Sair do jogo\n");
-    printf("--------------------------------\n");
+    interface_cabecalho("PAUSE");
+    interface_opcao(1, "Continuar");
+    interface_opcao(2, "Sair para o menu principal");
+    interface_opcao(3, "Sair do jogo");
+    interface_linha('-', 58);
     printf("Digite a opcao desejada: ");
     // Leitura defensiva para evitar lixo na entrada.
     if (scanf("%d", &opcao) != 1) {
@@ -317,7 +345,7 @@ void exibir_tabuleiro_visual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int
     printf("\nTABULEIRO\n");
     printf("Legenda: P=Pergunta A=Avanco R=Recuo .=Normal | Jogadores 1-4\n");
 
-    // Gera a exibiçao a cada bloco de 10 casas para caber adequadamente no terminal.
+    // Gera a exibicao a cada bloco de casas por unidade para caber adequadamente no terminal.
     for (inicio_linha = 1; inicio_linha <= tabuleiro->total; inicio_linha += 10) {
         fim_linha = inicio_linha + 10 - 1;
         if (fim_linha > tabuleiro->total) {
@@ -361,8 +389,15 @@ void exibir_tabuleiro_visual(tp_tabuleiro *tabuleiro, tp_player jogadores[], int
         // Linha 3: jogadores presentes em cada casa.
         printf("|%s|", "JOGS");
         for (casa_num = inicio_linha; casa_num <= fim_linha; casa_num++) {
-            char ocupacao[5] = {'.', '.', '.', '.', '\0'};
+            char ocupacao[5];
             int indice_ocupacao = 0;
+            int indice_limpeza;
+
+            // Inicializa o vetor de ocupacao com pontos e terminador de string.
+            for (indice_limpeza = 0; indice_limpeza < 4; indice_limpeza++) {
+                ocupacao[indice_limpeza] = '.';
+            }
+            ocupacao[4] = '\0';
 
             // Verifica quais jogadores estao presentes na casa_num.
             for (indice = 0; indice < numero_jogadores; indice++) {
