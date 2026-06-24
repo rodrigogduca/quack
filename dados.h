@@ -60,43 +60,6 @@ void copiar_texto(char destino[], int tamanho, char origem[]) {
     destino[i] = '\0';
 }
 
-// Anexa (concatena) um texto ao final de outro, respeitando o limite do buffer.
-void anexar_texto(char destino[], int tamanho, char origem[]) {
-    int i = 0;
-    int j = 0;
-
-    // Encontra o fim atual do destino.
-    while (i < tamanho && destino[i] != '\0') {
-        i++;
-    }
-
-    // Se nao houver espaco para adicionar nada (inclusive terminador), sai.
-    if (i >= tamanho - 1) {
-        if (tamanho > 0) destino[tamanho - 1] = '\0';
-        return;
-    }
-
-    // Se origem vazia, nao acrescenta espaco.
-    if (origem[0] == '\0') {
-        return;
-    }
-
-    // Adiciona um espaco separador caso haja texto previo e espaco disponivel.
-    if (i > 0 && i < tamanho - 1) {
-        destino[i] = ' ';
-        i++;
-    }
-
-    // Copia a origem respeitando o limite.
-    while (i < tamanho - 1 && origem[j] != '\0') {
-        destino[i] = origem[j];
-        i++;
-        j++;
-    }
-
-    destino[i] = '\0';
-}
-
 // Converte inteiro positivo para string.
 void inteiro_para_texto(int valor, char texto[]) {
     char invertido[12];
@@ -152,44 +115,6 @@ void montar_nome_jogador(char nome_saida[], int tamanho, int indice) {
     }
 
     nome_saida[i] = '\0';
-}
-
-// Cria uma carta e copia seus textos.
-tp_carta criar_carta(
-    char texto_pergunta[300],
-    char alternativa_1[150],
-    char alternativa_2[150],
-    char alternativa_3[150],
-    char alternativa_4[150],
-    char alternativa_5[150],
-    int resposta_correta,
-    int avanco_casas,
-    int nivel_dificuldade,
-    int unidade_referencia,
-    int identificador_carta,
-    char tema_texto[50],
-    char subtema_texto[50]
-) {
-    tp_carta nova_carta;
-
-    // Copia os textos do enunciado e das alternativas de forma segura para o struct da carta.
-    copiar_texto(nova_carta.pergunta, sizeof(nova_carta.pergunta), texto_pergunta);
-    copiar_texto(nova_carta.alternativas[0], sizeof(nova_carta.alternativas[0]), alternativa_1);
-    copiar_texto(nova_carta.alternativas[1], sizeof(nova_carta.alternativas[1]), alternativa_2);
-    copiar_texto(nova_carta.alternativas[2], sizeof(nova_carta.alternativas[2]), alternativa_3);
-    copiar_texto(nova_carta.alternativas[3], sizeof(nova_carta.alternativas[3]), alternativa_4);
-    copiar_texto(nova_carta.alternativas[4], sizeof(nova_carta.alternativas[4]), alternativa_5);
-
-    // Preenche os metadados numericos e textuais da carta.
-    nova_carta.resposta = resposta_correta;
-    nova_carta.avanco = avanco_casas;
-    nova_carta.dificuldade = nivel_dificuldade;
-    nova_carta.unidade = unidade_referencia;
-    nova_carta.id_carta = identificador_carta;
-    copiar_texto(nova_carta.tema, sizeof(nova_carta.tema), tema_texto);
-    copiar_texto(nova_carta.subtema, sizeof(nova_carta.subtema), subtema_texto);
-
-    return nova_carta;
 }
 
 // Preenche o banco fixo de perguntas a partir de um vetor ja estruturado.
@@ -565,11 +490,6 @@ int sortear_carta(
 
     // Recarrega quando todas as perguntas dessa pilha foram usadas.
     if (pilha_vazia(pilha)) {
-        printf(
-            "\nPerguntas da unidade %d dificuldade %d esgotadas. Reembaralhando...\n",
-            unidade,
-            dificuldade
-        );
         recarregar_pilha_unidade(pilha, banco, total, unidade, dificuldade);
     }
 
