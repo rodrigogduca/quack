@@ -1,76 +1,40 @@
+// fila.h
+// Declaracoes da estrutura Fila Circular (FIFO - First In, First Out).
+// Usada no gerenciamento da ordem dos turnos dos jogadores.
+
 #ifndef FILA_H
 #define FILA_H
 
-// fila.h
-// Implementacao de fila circular estatica.
-// Regra da fila: FIFO (First In, First Out).
-
-
-// Capacidade maxima da fila (numero de itens).
 #ifndef MAX
 #define MAX 100
 #endif
 
-// Tipo base armazenado na fila.
 #ifndef TP_ITEM_DEFINED
 #define TP_ITEM_DEFINED
-typedef int tp_item;
+typedef int tp_item;  // Tipo generico dos itens da fila
 #endif
 
-// tp_fila
-// ---------------------------------------------------------------------------
-// item: vetor com os elementos.
-// ini : indice logico anterior ao primeiro elemento.
-// fim : indice do ultimo elemento inserido.
+// Estrutura de uma fila circular estatica
+// Utiliza um vetor com indices ini (anterior ao primeiro) e fim (ultimo).
 typedef struct {
-    tp_item item[MAX];
-    int ini;
-    int fim;
+    tp_item item[MAX]; // Vetor circular que armazena os elementos
+    int ini;           // Indice anterior ao primeiro elemento
+    int fim;           // Indice do ultimo elemento
 } tp_fila;
 
-// Inicializa fila vazia.
-void inicializa_fila(tp_fila *f) {
-    // ini e fim iniciam apontando para a posicao anterior ao inicio.
-    f->ini = MAX - 1;
-    f->fim = MAX - 1;
-}
+// Inicializa a fila (ini = fim = MAX-1, indicando vazia)
+void inicializa_fila(tp_fila *f);
 
-// Retorna 1 se a fila estiver vazia, senao 0.
-int fila_vazia(tp_fila *f) {
-    return f->ini == f->fim;
-}
+// Retorna 1 se a fila esta vazia, 0 caso contrario
+int fila_vazia(tp_fila *f);
 
-// Calcula proxima posicao no vetor circular.
-int proximo(int pos) {
-    // Volta ao inicio quando chega ao fim do vetor.
-    if (pos == MAX - 1) return 0;
-    return pos + 1;
-}
+// Retorna 1 se a fila esta cheia, 0 caso contrario
+int fila_cheia(tp_fila *f);
 
-// Retorna 1 se a fila estiver cheia, senao 0.
-int fila_cheia(tp_fila *f) {
-    return proximo(f->fim) == f->ini;
-}
+// Insere elemento ao final da fila. Retorna 1 se sucesso, 0 se cheia.
+int insere_fila(tp_fila *f, tp_item e);
 
-// insere_fila - Insere elemento no fim da fila.
-// Retorna 1 em caso de sucesso, 0 se a fila estiver cheia.
-int insere_fila(tp_fila *f, tp_item e) {
-    // Verifica capacidade antes de inserir.
-    if (fila_cheia(f)) return 0;
-    f->fim = proximo(f->fim);
-    f->item[f->fim] = e;
-    return 1;
-}
-
-// remove_fila - Remove elemento do inicio da fila.
-// Retorna 1 em caso de sucesso, 0 se a fila estiver vazia.
-int remove_fila(tp_fila *f, tp_item *e) {
-    // Verifica se ha elementos antes de remover.
-    if (fila_vazia(f)) return 0;
-    f->ini = proximo(f->ini);
-    *e = f->item[f->ini];
-    return 1;
-}
-
+// Remove o elemento do inicio da fila e o armazena em *e. Retorna 1 se sucesso, 0 se vazia.
+int remove_fila(tp_fila *f, tp_item *e);
 
 #endif
